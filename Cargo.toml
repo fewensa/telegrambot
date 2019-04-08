@@ -1,0 +1,20 @@
+[package]
+name = "rbotele"
+version = "0.1.0"
+authors = ["fewensa <fewensa@protonmail.com>"]
+description = "Rust number kit"
+repository = "https://github.com/fewensa/rbotele"
+keywords = ["telegram", "bot", "chat", "api"]
+categories = ["api-bindings", "asynchronous"]
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+license = "MIT"
+readme = "README.md"
+edition = "2018"
+
+[dependencies]
+typed-builder = "0.3.0"

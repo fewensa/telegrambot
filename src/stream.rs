@@ -5,8 +5,11 @@ use futures::{Future, Stream, Async};
 use reqwest::r#async::{Client, Decoder};
 use crate::{TGBotError, TGBotErrorKind};
 use error_chain_mini::ErrorKind;
+use tokio::timer::Interval;
 
-pub struct UpdatesStream {}
+pub struct UpdatesStream {
+  pub interval: Interval
+}
 
 
 fn fetch() -> impl Future<Item=(), Error=()> {
@@ -35,14 +38,7 @@ impl Stream for UpdatesStream {
   type Error = TGBotError;
 
   fn poll(&mut self) -> Result<Async<Option<Self::Item>>, Self::Error> {
-    let mut a = fetch();
-    match futures::Future::poll(&mut a) {
-//    match fetch().poll() {
-      Ok(Async::Ready(value)) => {},
-      Ok(Async::NotReady) => return Ok(Async::NotReady),
-      Err(err) => return Err(TGBotErrorKind::Other.into_with(|| "Some err"))
-    }
-
+    try_ready!(self.interval.poll().map_err(|_| TGBotErrorKind::Other.into_with(|| "Some err")));
     Ok(Async::Ready(Some("abcd".to_string())))
   }
 }

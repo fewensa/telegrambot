@@ -1,4 +1,3 @@
-use std::ffi::OsStr;
 
 use error_chain_mini::ErrorKind;
 

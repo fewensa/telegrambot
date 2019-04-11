@@ -4,8 +4,6 @@ use futures::stream::Stream;
 
 use crate::{Config, ConnectMode, TGBotErrorKind, TGBotResult};
 use crate::stream::UpdatesStream;
-use tokio::timer::Interval;
-use std::time::Duration;
 
 pub fn run(cfg: &Config) -> TGBotResult<()> {
   match cfg.mode {
@@ -16,7 +14,7 @@ pub fn run(cfg: &Config) -> TGBotResult<()> {
 
 
 fn polling(cfg: &Config) -> TGBotResult<()> {
-  let stream = UpdatesStream { interval: Interval::new_interval(Duration::from_secs(1)) };
+  let stream = UpdatesStream::new();
   let future = stream.for_each(|update| {
     println!("some update. {:?}", update);
     Ok(())

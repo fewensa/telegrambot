@@ -3,7 +3,10 @@ use error_chain_mini::ErrorKind;
 
 //#[derive(ErrorKind)]
 pub enum TGBotErrorKind {
-  //  #[msg(short = "Lose telegram token", detailed = "Not found telegram token")]
+  //  #[msg(short = "Request error", detailed = "Request error")]
+  ClientError(reqwest::Error),
+  RequestError(reqwest::Error),
+  ProxyError(reqwest::Error),
   LoseToken,
   ComingSoon,
   Other,

@@ -6,7 +6,7 @@ use crate::{Config, ConnectMode, TGBotErrorKind, TGBotResult};
 use crate::stream::UpdatesStream;
 
 pub fn run(cfg: &Config) -> TGBotResult<()> {
-  match cfg.mode {
+  match cfg.mode() {
     ConnectMode::Polling => self::polling(cfg),
     ConnectMode::Webhook => Err(TGBotErrorKind::ComingSoon.into_with(|| "Coming soon.."))
   }
@@ -14,7 +14,7 @@ pub fn run(cfg: &Config) -> TGBotResult<()> {
 
 
 fn polling(cfg: &Config) -> TGBotResult<()> {
-  let stream = UpdatesStream::new();
+  let stream = UpdatesStream::new(cfg);
   let future = stream.for_each(|update| {
     println!("some update. {:?}", update);
     Ok(())

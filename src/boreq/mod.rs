@@ -1,3 +1,3 @@
-pub use self::req::TGReq;
+pub use self::req::*;
 
 mod req;

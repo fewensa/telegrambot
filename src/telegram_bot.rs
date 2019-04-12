@@ -1,19 +1,7 @@
 
 use error_chain_mini::ErrorKind;
 
-use crate::{botrun, TGBotErrorKind, TGBotResult};
-
-#[derive(Debug)]
-pub enum ConnectMode {
-  Polling,
-  Webhook,
-}
-
-#[derive(Debug)]
-pub struct Config {
-  pub token: String,
-  pub mode: ConnectMode,
-}
+use crate::{botrun, TGBotErrorKind, TGBotResult, Config};
 
 #[derive(Debug)]
 pub struct TelegramBot {
@@ -22,7 +10,7 @@ pub struct TelegramBot {
 
 impl TelegramBot {
   pub fn new(cfg: Config) -> TGBotResult<Self> {
-    if cfg.token.is_empty() {
+    if cfg.token().is_empty() {
       return Err(TGBotErrorKind::LoseToken.into_with(|| "Telegram bot token is empty."));
     }
     Ok(TelegramBot {

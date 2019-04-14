@@ -35,11 +35,14 @@ fn telegram_api_url<'a>() -> &'a str {
 pub fn exec<Req, S>(cfg: Arc<Config>, method: S, req: &Req)
                     -> TGFuture<HttpResp>
   where Req: TGReq + Serialize, S: AsRef<str> {
-  let api = Url::parse(&format!("{}bot{}/{}", TELEGRAM_API_URL, cfg.token(), method.as_ref().to_string())[..]).unwrap();
+  let method_api = method.as_ref().to_string();
+  let api = Url::parse(&format!("{}bot{}/{}", TELEGRAM_API_URL, cfg.token(), method_api)[..]).unwrap();
   let client = cfg.client();
 
   let json = serde_json::to_string(req).unwrap();
-  debug!(tglog::telegram(), "REQUEST URL => [{}]   REQUEST BODY => {}", api, json);
+  debug!(tglog::telegram(), "REQUEST URL => [{}]   REQUEST BODY => {}",
+         format!("{}bot___/{}", TELEGRAM_API_URL, method_api),
+         json);
 
   let reqfut = client.post(api)
     .header("content-type", "application/json")

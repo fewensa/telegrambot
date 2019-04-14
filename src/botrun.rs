@@ -5,6 +5,7 @@ use futures::future::Future;
 use futures::stream::Stream;
 
 use crate::{Config, ConnectMode, TGBotErrorKind, TGBotResult, tglog};
+use crate::advanced::TGAdvancedHandler;
 use crate::stream::UpdatesStream;
 
 pub fn run(cfg: Arc<Config>) -> TGBotResult<()> {
@@ -18,12 +19,11 @@ pub fn run(cfg: Arc<Config>) -> TGBotResult<()> {
 fn polling(cfg: Arc<Config>) -> TGBotResult<()> {
   let stream = UpdatesStream::new(cfg);
   let future = stream.for_each(|update| {
-//    println!("some update. {:?}", update);
-    debug!(tglog::telegram(), "UPDATE: {:?}", update);
+    TGAdvancedHandler::new(update).handle();
     Ok(())
   }).map_err(|e| {
-    // todo: some error.
-    println!("{:?}", e);
+    // todo: some error handle.
+    error!(tglog::telegram(), "Stream error: {:?}", e);
   });
   tokio::run(future);
   Ok(())

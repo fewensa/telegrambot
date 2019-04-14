@@ -39,7 +39,7 @@ impl UpdatesStream {
 
 impl Stream for UpdatesStream {
   type Item = Update;
-  type Error = TGBotError;
+  type Error = TGBotError; // todo: do not return error, if happen error, wait and retry
 
   fn poll(&mut self) -> Result<Async<Option<Self::Item>>, Self::Error> {
     if let Some(value) = self.buffer.pop_front() {

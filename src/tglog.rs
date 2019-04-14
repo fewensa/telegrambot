@@ -6,7 +6,7 @@ use slog::{Drain, FnValue, Level, Logger};
 lazy_static! {
     /// Documentation!
     static ref LOGGER_TG: Logger = log("telegram");
-    static ref LOGGER_LAYER: Logger = log("layer");
+    static ref LOGGER_ADVANCED: Logger = log("advanced");
 }
 
 fn level() -> Level {
@@ -44,7 +44,7 @@ pub fn telegram() -> &'static Logger {
   &LOGGER_TG
 }
 
-pub fn layer() -> &'static Logger {
-  &LOGGER_LAYER
+pub fn advanced() -> &'static Logger {
+  &LOGGER_ADVANCED
 }
 

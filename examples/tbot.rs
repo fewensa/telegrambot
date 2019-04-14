@@ -1,6 +1,6 @@
 use std::env;
 
-use rbotele::{Config, ConfigBuilder, ConnectMode, TelegramBot};
+use rbotele::{Config, ConfigBuilder, ConnectMode, TelegramBot, Track};
 
 fn main() {
   let token = env::var("TELEGRAM_BOT_TOKEN").unwrap();
@@ -10,8 +10,9 @@ fn main() {
 //    .proxy("http://127.0.0.1:1081")
     .build()
     .unwrap();
-  let bot = TelegramBot::new(cfg).unwrap()
-    .command()
+  TelegramBot::new(cfg).unwrap()
+    .on_text(Track::All)
+    .on_update()
     .start()
     .unwrap();
 }

@@ -1,11 +1,12 @@
+use std::sync::Arc;
 
 use error_chain_mini::ErrorKind;
 
-use crate::{botrun, TGBotErrorKind, TGBotResult, Config};
+use crate::{botrun, Config, TGBotErrorKind, TGBotResult};
 
 #[derive(Debug)]
 pub struct TelegramBot {
-  cfg: Config
+  cfg: Arc<Config>
 }
 
 impl TelegramBot {
@@ -14,7 +15,7 @@ impl TelegramBot {
       return Err(TGBotErrorKind::LoseToken.into_with(|| "Telegram bot token is empty."));
     }
     Ok(TelegramBot {
-      cfg
+      cfg: Arc::new(cfg)
     })
   }
 
@@ -23,6 +24,6 @@ impl TelegramBot {
   }
 
   pub fn start(&self) -> TGBotResult<()> {
-    botrun::run(&self.cfg)
+    botrun::run(self.cfg.clone())
   }
 }

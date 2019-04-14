@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+use std::sync::Arc;
 use std::time::Duration;
 
 use error_chain_mini::ErrorKind;
@@ -5,52 +7,90 @@ use futures::{Async, Stream};
 use futures::future::Future;
 use tokio::timer::Interval;
 
-use crate::{TGBotError, TGBotErrorKind, TGFuture};
-use crate::boreq::{TGReq, UpdateReq};
+use crate::{TGBotError, TGBotErrorKind, TGFuture, tglog};
+use crate::botapi::{GetUpdates, TGReq, TGResp};
 use crate::config::Config;
 use crate::types::Update;
 
-pub struct UpdatesStream<'cfg> {
-  cfg: &'cfg Config,
-  interval: Interval,
-  boreq: Option<TGFuture<Option<Vec<Update>>>>,
-  updreq: Option<TGFuture<Option<String>>>,
+const TELEGRAM_LONG_POLL_TIMEOUT_SECONDS: u64 = 5;
+const TELEGRAM_LONG_POLL_ERROR_DELAY_MILLISECONDS: u64 = 500;
+
+pub struct UpdatesStream {
+  cfg: Arc<Config>,
+//  interval: Interval,
+  error_interval: Interval,
+  last_update: i64,
+  buffer: VecDeque<Update>,
+  botapi: Option<TGFuture<Option<Vec<Update>>>>,
 }
 
 impl UpdatesStream {
-  pub fn new(cfg: &Config) -> Self {
+  pub fn new(cfg: Arc<Config>) -> Self {
     UpdatesStream {
       cfg,
-      interval: Interval::new_interval(Duration::from_secs(1)),
-      boreq: None,
-      updreq: None,
+//      interval: Interval::new_interval(Duration::from_secs(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS)),
+      error_interval: Interval::new_interval(Duration::from_millis(TELEGRAM_LONG_POLL_ERROR_DELAY_MILLISECONDS)),
+      last_update: 0,
+      buffer: VecDeque::new(),
+      botapi: None,
     }
   }
 }
 
 impl Stream for UpdatesStream {
-  type Item = String;
+  type Item = Update;
   type Error = TGBotError;
 
   fn poll(&mut self) -> Result<Async<Option<Self::Item>>, Self::Error> {
-    try_ready!(self.interval.poll().map_err(|_| TGBotErrorKind::Other.into_with(|| "Some err")));
+    if let Some(value) = self.buffer.pop_front() {
+      return Ok(Async::Ready(Some(value)));
+    }
 
-    let upfut = self.updreq.get_or_insert_with(|| {
-      self::send(UpdateReq {})
+//    try_ready!(self.interval.poll().map_err(|_| TGBotErrorKind::Other.into_with(|| "Interval error")));
+
+    let cfg = self.cfg.clone();
+    let last_update = self.last_update;
+
+    let upfut = self.botapi.get_or_insert_with(|| {
+      self::send(cfg, GetUpdates::new()
+        .offset(last_update + 1)
+        .timeout(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS as i64))
     });
 
-    match try_ready!(upfut.poll()) {
-      Some(value) => { println!("{:?}", value) }
-      None => {}
-    }
-    self.updreq = None;
+    let _updates: Option<Vec<Update>> = match upfut.poll() {
+      Ok(Async::Ready(t)) => t,
+      Ok(Async::NotReady) => return Ok(Async::NotReady),
+      Err(err) => {
+        try_ready!(self.error_interval.poll().map_err(|_| TGBotErrorKind::Other.into_with(|| "Interval error")));
+        return Err(err);
+      }
+    };
 
-    Ok(Async::Ready(Some("abcd".to_string())))
+    if let Some(updates) = _updates {
+      for update in updates {
+        self.last_update = core::cmp::max(update.id, self.last_update);
+        self.buffer.push_back(update);
+      }
+    }
+
+    self.botapi = None;
+    self.poll()
   }
 }
 
-// -> TGFuture<REQ>
-fn send<REQ: TGReq>(req: REQ) -> TGFuture<Option<String>> {
-  req.request()
+fn send<Req: TGReq>(cfg: Arc<Config>, req: Req) -> TGFuture<Option<<Req::Resp as TGResp>::Type>> {
+  let fut = req.request(cfg)
+    .map(move |resp| {
+      let dez: Result<<Req::Resp as TGResp>::Type, TGBotError> = Req::Resp::deserialize(resp);
+      match dez {
+        Ok(ret) => Some(ret),
+        Err(err) => {
+          // todo: if error do more thing
+          error!(tglog::telegram(), "Call telegram api fail: {:?}", err);
+          None
+        }
+      }
+    }).map_err(|e| e);
+  TGFuture::new(Box::new(fut))
 }
 

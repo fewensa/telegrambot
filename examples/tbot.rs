@@ -7,7 +7,7 @@ fn main() {
 //  let cfg = Config::new(token);
 //  let cfg = Config { token, mode: ConnectMode::Polling };
   let cfg = Config::builder(token)
-    .proxy("http://localhost:1081")
+//    .proxy("http://127.0.0.1:1081")
     .build()
     .unwrap();
   let bot = TelegramBot::new(cfg).unwrap()

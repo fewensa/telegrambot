@@ -2,7 +2,7 @@ use std::ffi::OsStr;
 
 use error_chain_mini::ErrorKind;
 use reqwest::Proxy;
-use reqwest::r#async::{Client, ClientBuilder};
+use reqwest::r#async::Client;
 
 use crate::{TGBotErrorKind, TGBotResult};
 
@@ -13,7 +13,7 @@ pub enum ConnectMode {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Config {
   token: String,
   mode: ConnectMode,
@@ -38,8 +38,12 @@ impl Config {
     self.mode.clone()
   }
 
-  pub fn client(&self) -> TGBotResult<Client> {
-    Ok(self.client.clone().unwrap())
+  pub fn client(&self) -> Client {
+    match self.client.clone() {
+      Some(c) => c,
+      None => panic!("some error")
+    }
+//    self.client.clone().unwrap()
   }
 }
 

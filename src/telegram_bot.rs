@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-use std::rc::Rc;
 use std::sync::Arc;
 
 use error_chain_mini::ErrorKind;
@@ -9,7 +7,7 @@ use crate::config::Config;
 use crate::errors::{TGBotErrorKind, TGBotResult};
 use crate::listener::{Listener, Lout};
 use crate::types::Update;
-use crate::vision::ATextMessage;
+use crate::vision::TextMessage;
 
 pub struct TelegramBot {
   cfg: Arc<Config>,
@@ -32,7 +30,7 @@ impl TelegramBot {
     self
   }
 
-  pub fn on_text_message<F>(&mut self, fnc: F) -> &mut Self where F: Fn((&ATextMessage, bool)) + Send + Sync + 'static {
+  pub fn on_text_message<F>(&mut self, fnc: F) -> &mut Self where F: Fn((&TextMessage, bool)) + Send + Sync + 'static {
     self.listener.on_text_message(fnc);
     self
   }

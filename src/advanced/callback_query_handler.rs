@@ -1,3 +1,6 @@
+use std::sync::Arc;
+
+use crate::listener::Lout;
 use crate::types::CallbackQuery;
 
 pub struct TGCallbackQueryHandler<'a> {
@@ -13,7 +16,7 @@ impl<'a> TGCallbackQueryHandler<'a> {
     }
   }
 
-  pub fn handle(&self) {
+  pub fn handle(&self, lout: &Arc<Lout>) {
 
   }
 }

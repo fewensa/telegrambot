@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use crate::advanced::Track;
 use crate::types::Update;
-use crate::vision::ATextMessage;
+use crate::vision::TextMessage;
 
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub enum ListenerType {
@@ -16,7 +16,7 @@ pub enum ListenerType {
 
 #[derive(Clone)]
 pub struct Listener {
-  text_handler: HashMap<Track, Arc<Box<dyn Fn((&ATextMessage, bool)) + Send + Sync + 'static>>>,
+  text_handler: HashMap<Track, Arc<Box<dyn Fn((&TextMessage, bool)) + Send + Sync + 'static>>>,
   update_handler: Option<Arc<Box<dyn Fn(&Update) + Send + Sync + 'static>>>,
 }
 
@@ -43,10 +43,12 @@ impl Listener {
     self
   }
 
-  pub fn on_text_message<F>(&mut self, fnc: F) -> &mut Self where F: Fn((&ATextMessage, bool)) + Send + Sync + 'static {
+  pub fn on_text_message<F>(&mut self, fnc: F) -> &mut Self where F: Fn((&TextMessage, bool)) + Send + Sync + 'static {
     self.text_handler.insert(Track::Message, Arc::new(Box::new(fnc)));
     self
   }
+
+//  pub fn on_channel_post_text_message
 
   pub fn on_error(&mut self) -> &mut Self {
     self
@@ -62,7 +64,7 @@ impl Lout {
     Lout { listener }
   }
 
-  pub fn listen_text(&self, track: Track) -> Option<&Arc<Box<dyn Fn((&ATextMessage, bool)) + Send + Sync + 'static>>> {
+  pub fn listen_text(&self, track: Track) -> Option<&Arc<Box<dyn Fn((&TextMessage, bool)) + Send + Sync + 'static>>> {
     self.listener.text_handler.get(&track)
   }
 

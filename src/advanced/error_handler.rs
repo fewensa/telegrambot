@@ -1,4 +1,6 @@
+use std::sync::Arc;
 
+use crate::listener::Lout;
 
 pub struct TGErrorHandler<'a> {
   update_id: i64,
@@ -10,7 +12,7 @@ impl<'a> TGErrorHandler<'a> {
     TGErrorHandler { update_id, msg }
   }
 
-  pub fn handle(&self) {
+  pub fn handle(&self, lout: &Arc<Lout>) {
 
   }
 }

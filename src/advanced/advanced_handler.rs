@@ -51,15 +51,15 @@ impl TGAdvancedHandler {
       }
       UpdateKind::CallbackQuery(query) => {
         TGCallbackQueryHandler::new(self.update.id, query)
-          .handle()
+          .handle(&self.lout)
       }
       UpdateKind::Error(msg) => {
         TGErrorHandler::new(self.update.id, msg)
-          .handle()
+          .handle(&self.lout)
       }
       _ => {
         TGErrorHandler::new(self.update.id, &"Unknow update kind".to_string())
-          .handle()
+          .handle(&self.lout)
       }
     };
   }

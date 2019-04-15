@@ -1,4 +1,4 @@
-pub use self::amessage::*;
+pub use self::message::*;
 
-mod amessage;
+mod message;
 

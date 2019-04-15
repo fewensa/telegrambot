@@ -1,7 +1,7 @@
 use crate::types::*;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub struct ATextMessage {
+pub struct TextMessage {
   /// Unique message identifier inside this chat.
   pub id: MessageId,
   /// Sender, can be empty for messages sent to channels.
@@ -24,7 +24,7 @@ pub struct ATextMessage {
   pub entities: Vec<MessageEntity>,
 }
 
-pub struct AChannelMessage {
+pub struct ChannelPostTextMessage {
   /// Unique message identifier inside this chat.
   pub id: MessageId,
   /// Date the message was sent in Unix time.

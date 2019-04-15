@@ -4,7 +4,7 @@ use crate::tglog;
 use crate::advanced::Track;
 use crate::listener::Lout;
 use crate::types::{ChannelPost, Message, MessageEntity, MessageKind};
-use crate::vision::ATextMessage;
+use crate::vision::TextMessage;
 
 //#[derive(Debug, Clone, Eq, PartialEq, PartialOrd, Hash)]
 //enum MessageEntityKind {
@@ -36,7 +36,7 @@ pub fn handle_message(update_id: i64, edited: bool,
   }
   let listen_text = listen_text.unwrap();
 
-  let atm = ATextMessage {
+  let atm = TextMessage {
     id: message.id.clone(),
     from: message.from.clone(),
     date: message.date,

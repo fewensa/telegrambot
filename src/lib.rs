@@ -3,6 +3,8 @@ extern crate error_chain_mini;
 extern crate error_chain_mini_derive;
 #[macro_use]
 extern crate futures;
+#[macro_use]
+extern crate lazy_static;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
@@ -12,22 +14,19 @@ extern crate serde_value;
 extern crate slog;
 extern crate slog_term;
 
-#[macro_use]
-extern crate lazy_static;
-
-pub use self::config::*;
-pub use self::errors::{TGBotError, TGBotErrorKind, TGBotResult};
-pub use self::telegram_bot::{TelegramBot, Track};
-pub use self::tgfut::TGFuture;
-pub use self::types::*;
+pub use self::telegram_bot::TelegramBot;
 
 mod telegram_bot;
-mod errors;
 mod stream;
 mod botrun;
-mod types;
 mod tgfut;
 mod botapi;
-mod config;
 mod tglog;
 mod advanced;
+mod listener;
+
+pub mod errors;
+pub mod api;
+pub mod types;
+pub mod config;
+pub mod vision;

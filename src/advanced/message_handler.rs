@@ -1,3 +1,7 @@
+use std::sync::Arc;
+
+use crate::advanced::text_handler;
+use crate::listener::Lout;
 use crate::types::{Message, MessageKind};
 
 pub struct TGMessageHandler<'a> {
@@ -15,10 +19,10 @@ impl<'a> TGMessageHandler<'a> {
     }
   }
 
-  pub fn handle(&self) {
+  pub fn handle(&self, lout: &Arc<Lout>) {
     match self.message.kind {
       MessageKind::Text { ref data, ref entities } => {
-        println!("{:?}  <<++>>  {:?}", data, entities);
+        text_handler::handle_message(self.update_id, self.edited, self.message, data, entities, lout)
       }
       MessageKind::Audio { ref data, .. } => {}
       MessageKind::Document { ref data, ref caption } => {}

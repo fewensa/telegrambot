@@ -7,9 +7,12 @@ use futures::{Async, Stream};
 use futures::future::Future;
 use tokio::timer::Interval;
 
-use crate::{TGBotError, TGBotErrorKind, TGFuture, tglog};
 use crate::botapi::{GetUpdates, TGReq, TGResp};
 use crate::config::Config;
+use crate::errors::TGBotError;
+use crate::errors::TGBotErrorKind;
+use crate::tgfut::TGFuture;
+use crate::tglog;
 use crate::types::Update;
 
 const TELEGRAM_LONG_POLL_TIMEOUT_SECONDS: u64 = 5;
@@ -17,7 +20,7 @@ const TELEGRAM_LONG_POLL_ERROR_DELAY_MILLISECONDS: u64 = 500;
 
 pub struct UpdatesStream {
   cfg: Arc<Config>,
-//  interval: Interval,
+  //  interval: Interval,
   error_interval: Interval,
   last_update: i64,
   buffer: VecDeque<Update>,

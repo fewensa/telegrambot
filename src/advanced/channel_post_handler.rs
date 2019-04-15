@@ -1,23 +1,28 @@
+use crate::advanced::text_handler;
 use crate::types::{ChannelPost, MessageKind};
+use std::sync::Arc;
+use crate::listener::Lout;
 
-pub struct TGPostHandler<'a> {
+pub struct TGChannelPostHandler<'a> {
   update_id: i64,
-  post: &'a ChannelPost,
+  channel_post: &'a ChannelPost,
   edited: bool
 }
 
-impl<'a> TGPostHandler<'a> {
-  pub fn new(update_id: i64, post: &'a ChannelPost, edited: bool) -> Self {
-    TGPostHandler {
+impl<'a> TGChannelPostHandler<'a> {
+  pub fn new(update_id: i64, channel_post: &'a ChannelPost, edited: bool) -> Self {
+    TGChannelPostHandler {
       update_id,
-      post,
+      channel_post,
       edited
     }
   }
 
-  pub fn handle(&self) {
-    match self.post.kind {
-      MessageKind::Text { ref data, ref entities } => {}
+  pub fn handle(&self, lout: &Arc<Lout>) {
+    match self.channel_post.kind {
+      MessageKind::Text { ref data, ref entities } => {
+        text_handler::handle_channel_post(self.update_id, self.edited, self.channel_post, data, entities, lout)
+      }
       MessageKind::Audio { ref data, .. } => {}
       MessageKind::Document { ref data, ref caption } => {}
       MessageKind::Photo { ref data, ref caption, ref media_group_id } => {}

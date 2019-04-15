@@ -1,19 +1,19 @@
+use std::collections::HashMap;
+use std::rc::Rc;
 use std::sync::Arc;
 
 use error_chain_mini::ErrorKind;
 
-use crate::{botrun, Config, TGBotErrorKind, TGBotResult};
+use crate::botrun;
+use crate::config::Config;
+use crate::errors::{TGBotErrorKind, TGBotResult};
+use crate::listener::{Listener, Lout};
+use crate::types::Update;
+use crate::vision::ATextMessage;
 
-
-pub enum Track {
-  All,
-  Message,
-  Channel
-}
-
-#[derive(Debug)]
 pub struct TelegramBot {
-  cfg: Arc<Config>
+  cfg: Arc<Config>,
+  listener: Listener,
 }
 
 impl TelegramBot {
@@ -22,31 +22,28 @@ impl TelegramBot {
       return Err(TGBotErrorKind::LoseToken.into_with(|| "Telegram bot token is empty."));
     }
     Ok(TelegramBot {
-      cfg: Arc::new(cfg)
+      cfg: Arc::new(cfg),
+      listener: Listener::default(),
     })
   }
 
-  pub fn on_update(&self) -> &Self {
+  pub fn on_update<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&Update) + Send + Sync + 'static {
+    self.listener.on_update(fnc);
     self
   }
 
-  pub fn on_callback_query(&self) -> &Self {
-    self
-  }
-
-  pub fn on_command(&self, track: Track) -> &Self {
-    self
-  }
-
-  pub fn on_text(&self, track: Track) -> &Self {
-    self
-  }
-
-  pub fn on_error(&self) -> &Self {
+  pub fn on_text_message<F>(&mut self, fnc: F) -> &mut Self where F: Fn((&ATextMessage, bool)) + Send + Sync + 'static {
+    self.listener.on_text_message(fnc);
     self
   }
 
   pub fn start(&self) -> TGBotResult<()> {
-    botrun::run(self.cfg.clone())
+    let lout = Lout::new(self.listener.clone());
+    if let Err(error) = botrun::run(self.cfg.clone(), Arc::new(lout)) {
+      return Err(error);
+    }
+    Ok(())
   }
 }
+
+

@@ -1,6 +1,7 @@
 use std::env;
 
-use rbotele::{Config, ConfigBuilder, ConnectMode, TelegramBot, Track};
+use rbotele::{api, TelegramBot};
+use rbotele::config::Config;
 
 fn main() {
   let token = env::var("TELEGRAM_BOT_TOKEN").unwrap();
@@ -10,9 +11,20 @@ fn main() {
 //    .proxy("http://127.0.0.1:1081")
     .build()
     .unwrap();
-  TelegramBot::new(cfg).unwrap()
-    .on_text(Track::All)
-    .on_update()
+
+
+  TelegramBot::new(cfg)
+    .unwrap()
+//    .on_update(|update| {
+//      println!("{:?}", update);
+//    })
+    .on_text_message(|(message, edited)| {
+      match edited {
+        false => println!("POST {:#?}", message),
+        true => println!("EDITED {:#?}", message)
+      }
+      api::get_me();
+    })
     .start()
     .unwrap();
 }

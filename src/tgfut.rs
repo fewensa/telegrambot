@@ -1,6 +1,6 @@
 use futures::{Future, Poll};
 
-use crate::TGBotError;
+use crate::errors::TGBotError;
 
 /// Represent a future that resolves into Telegram API response.
 #[must_use = "futures do nothing unless polled"]

@@ -1,39 +1,53 @@
+use std::sync::Arc;
+
 use crate::advanced::callback_query_handler::TGCallbackQueryHandler;
+use crate::advanced::channel_post_handler::TGChannelPostHandler;
 use crate::advanced::error_handler::TGErrorHandler;
 use crate::advanced::message_handler::TGMessageHandler;
-use crate::advanced::post_handler::TGPostHandler;
+use crate::config::Config;
+use crate::listener::Lout;
 use crate::tglog;
 use crate::types::{Update, UpdateKind};
 
 pub struct TGAdvancedHandler {
-  update: Update
+  cfg: Arc<Config>,
+  lout: Arc<Lout>,
+  update: Update,
 }
 
 impl TGAdvancedHandler {
-  pub fn new(update: Update) -> Self {
+  pub fn new(cfg: Arc<Config>, lout: Arc<Lout>, update: Update) -> Self {
     TGAdvancedHandler {
-      update
+      cfg,
+      lout,
+      update,
     }
   }
 
   pub fn handle(&self) {
     debug!(tglog::advanced(), "UPDATE => {:?}", self.update);
+
+    if let Some(update_listener) = self.lout.listen_update() {
+      (*update_listener)(&self.update);
+      return;
+    }
+
     match &self.update.kind {
       UpdateKind::Message(message) => {
         TGMessageHandler::new(self.update.id, message, false)
-          .handle()
+          .handle(&self.lout)
       }
       UpdateKind::EditedMessage(message) => {
         TGMessageHandler::new(self.update.id, message, true)
-          .handle()
+          .handle(&self.lout)
       }
       UpdateKind::ChannelPost(post) => {
-        TGPostHandler::new(self.update.id, post, false)
-          .handle()
+        TGChannelPostHandler::new(self.update.id, post, false)
+          .handle(&self.lout)
       }
       UpdateKind::EditedChannelPost(post) => {
-        TGPostHandler::new(self.update.id, post, true)
-          .handle()
+        TGChannelPostHandler::new(self.update.id, post, true)
+          .handle(&self.lout)
       }
       UpdateKind::CallbackQuery(query) => {
         TGCallbackQueryHandler::new(self.update.id, query)

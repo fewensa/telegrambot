@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
-use crate::{Config, TGFuture};
 use crate::botapi::resp::{HttpResp, TGResp};
+use crate::config::Config;
+use crate::tgfut::TGFuture;
 
 pub trait TGReq {
   type Resp: TGResp + 'static;

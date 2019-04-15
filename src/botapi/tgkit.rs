@@ -6,9 +6,12 @@ use futures::stream::Stream;
 use reqwest::Url;
 use serde::Serialize;
 
-use crate::{Config, TGBotErrorKind, TGFuture, tglog};
 use crate::botapi::resp::HttpResp;
 use crate::botapi::TGReq;
+use crate::config::Config;
+use crate::errors::TGBotErrorKind;
+use crate::tgfut::TGFuture;
+use crate::tglog;
 
 pub const TELEGRAM_API_URL: &'static str = "https://tgb.akafwtll.tk/";
 

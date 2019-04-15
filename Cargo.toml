@@ -21,7 +21,6 @@ edition = "2018"
 error-chain-mini = "0.2.0"
 error-chain-mini-derive = "0.2.0"
 
-typed-builder = "0.3.0"
 futures = "0.1.26"
 tokio = "0.1.18"
 reqwest = "0.9.14"

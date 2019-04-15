@@ -1,8 +1,9 @@
 use std::sync::Arc;
 
-use crate::{Config, TGFuture};
 use crate::botapi::{tgkit, TGReq};
-use crate::botapi::resp::{RespType, HttpResp};
+use crate::botapi::resp::{HttpResp, RespType};
+use crate::config::Config;
+use crate::tgfut::TGFuture;
 use crate::types::Update;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]

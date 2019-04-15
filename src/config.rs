@@ -4,7 +4,7 @@ use error_chain_mini::ErrorKind;
 use reqwest::Proxy;
 use reqwest::r#async::Client;
 
-use crate::{TGBotErrorKind, TGBotResult};
+use crate::errors::{TGBotErrorKind, TGBotResult};
 
 #[derive(Debug, Clone)]
 pub enum ConnectMode {

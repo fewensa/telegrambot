@@ -60,26 +60,26 @@ impl<S> ToSourceChat for S where S: Deref, S::Target: ToSourceChat {
   }
 }
 
-impl ToSourceChat for Message {
-  fn to_source_chat(&self) -> ChatId {
-    self.chat.id()
-  }
-}
+//impl ToSourceChat for Message {
+//  fn to_source_chat(&self) -> ChatId {
+//    self.chat.id()
+//  }
+//}
 
-impl ToSourceChat for ChannelPost {
-  fn to_source_chat(&self) -> ChatId {
-    self.chat.id.into()
-  }
-}
+//impl ToSourceChat for ChannelPost {
+//  fn to_source_chat(&self) -> ChatId {
+//    self.chat.id.into()
+//  }
+//}
 
-impl ToSourceChat for MessageOrChannelPost {
-  fn to_source_chat(&self) -> ChatId {
-    match self {
-      &MessageOrChannelPost::Message(ref message) => message.to_source_chat(),
-      &MessageOrChannelPost::ChannelPost(ref channel_post) => channel_post.to_source_chat(),
-    }
-  }
-}
+//impl ToSourceChat for MessageOrChannelPost {
+//  fn to_source_chat(&self) -> ChatId {
+//    match self {
+//      &MessageOrChannelPost::Message(ref message) => message.to_source_chat(),
+//      &MessageOrChannelPost::ChannelPost(ref channel_post) => channel_post.to_source_chat(),
+//    }
+//  }
+//}
 
 /// Unique identifier for the target chat or username of the
 /// target channel (in the format @channelusername)
@@ -261,28 +261,29 @@ impl ToMessageId for MessageId {
   }
 }
 
-impl ToMessageId for Message {
-  fn to_message_id(&self) -> MessageId {
-    self.id
-  }
-}
+//impl ToMessageId for Message {
+//  fn to_message_id(&self) -> MessageId {
+//    self.id
+//  }
+//}
 
-impl ToMessageId for ChannelPost {
-  fn to_message_id(&self) -> MessageId {
-    self.id
-  }
-}
+//impl ToMessageId for ChannelPost {
+//  fn to_message_id(&self) -> MessageId {
+//    self.id
+//  }
+//}
 
-impl ToMessageId for MessageOrChannelPost {
-  fn to_message_id(&self) -> MessageId {
-    match self {
-      &MessageOrChannelPost::Message(ref message) => message.to_message_id(),
-      &MessageOrChannelPost::ChannelPost(ref channel_post) => channel_post.to_message_id(),
-    }
-  }
-}
+//impl ToMessageId for MessageOrChannelPost {
+//  fn to_message_id(&self) -> MessageId {
+//    match self {
+//      &MessageOrChannelPost::Message(ref message) => message.to_message_id(),
+//      &MessageOrChannelPost::ChannelPost(ref channel_post) => channel_post.to_message_id(),
+//    }
+//  }
+//}
 
 /// Unique message identifier inside a chat.
+// todo necessity
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct MessageId(i64);
 integer_id_impls!(MessageId);

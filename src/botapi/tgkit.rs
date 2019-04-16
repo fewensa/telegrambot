@@ -35,8 +35,7 @@ fn telegram_api_url<'a>() -> &'a str {
   }
 }
 
-pub fn exec<Req, S>(cfg: Arc<Config>, method: S, req: &Req)
-                    -> TGFuture<HttpResp>
+pub fn exec<Req, S>(cfg: Arc<Config>, method: S, req: &Req) -> TGFuture<HttpResp>
   where Req: TGReq + Serialize, S: AsRef<str> {
   let method_api = method.as_ref().to_string();
   let api = Url::parse(&format!("{}bot{}/{}", TELEGRAM_API_URL, cfg.token(), method_api)[..]).unwrap();

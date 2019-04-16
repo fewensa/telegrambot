@@ -15,12 +15,12 @@ use crate::tgfut::TGFuture;
 use crate::tglog;
 use crate::types::Update;
 
-const TELEGRAM_LONG_POLL_TIMEOUT_SECONDS: u64 = 5;
+const TELEGRAM_LONG_POLL_TIMEOUT_SECONDS: i64 = 5;
 const TELEGRAM_LONG_POLL_ERROR_DELAY_MILLISECONDS: u64 = 500;
 
 pub struct UpdatesStream {
   cfg: Arc<Config>,
-  //  interval: Interval,
+//    interval: Interval,
   error_interval: Interval,
   last_update: i64,
   buffer: VecDeque<Update>,
@@ -57,26 +57,34 @@ impl Stream for UpdatesStream {
     let upfut = self.botapi.get_or_insert_with(|| {
       self::send(cfg, GetUpdates::new()
         .offset(last_update + 1)
-        .timeout(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS as i64))
+        .timeout(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS))
     });
 
     let _updates: Option<Vec<Update>> = match upfut.poll() {
       Ok(Async::Ready(t)) => t,
       Ok(Async::NotReady) => return Ok(Async::NotReady),
       Err(err) => {
-        try_ready!(self.error_interval.poll().map_err(|_| TGBotErrorKind::Other.into_with(|| "Interval error")));
+//        try_ready!(self.error_interval.poll().map_err(|_| TGBotErrorKind::Other.into_with(|| "Interval error")));
+        self.botapi = None;
+        // todo: do not return error, if happen error, wait and retry
         return Err(err);
       }
     };
 
-    if let Some(updates) = _updates {
-      for update in updates {
-        self.last_update = core::cmp::max(update.id, self.last_update);
-        self.buffer.push_back(update);
+    match _updates {
+      Some(updates) => {
+        for update in updates {
+          self.last_update = core::cmp::max(update.id, self.last_update);
+          self.buffer.push_back(update);
+        }
+        self.botapi = None;
+      },
+      None => {
+        self.botapi = None;
+        try_ready!(self.error_interval.poll().map_err(|_| TGBotErrorKind::Other.into_with(|| "Interval error")));
       }
     }
 
-    self.botapi = None;
     self.poll()
   }
 }

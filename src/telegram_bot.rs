@@ -6,8 +6,8 @@ use crate::botrun;
 use crate::config::Config;
 use crate::errors::{TGBotErrorKind, TGBotResult};
 use crate::listener::{Listener, Lout};
-use crate::types::Update;
-use crate::vision::TextMessage;
+use crate::types::{MessageEntity, Update};
+use crate::vision::*;
 
 pub struct TelegramBot {
   cfg: Arc<Config>,
@@ -30,8 +30,23 @@ impl TelegramBot {
     self
   }
 
-  pub fn on_text_message<F>(&mut self, fnc: F) -> &mut Self where F: Fn((&TextMessage, bool)) + Send + Sync + 'static {
-    self.listener.on_text_message(fnc);
+  pub fn on_text<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&VTextMessage) + Send + Sync + 'static {
+    self.listener.on_text(fnc);
+    self
+  }
+
+  pub fn on_photo<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&VPhotoMessage) + Send + Sync + 'static {
+    self.listener.on_photo(fnc);
+    self
+  }
+
+  pub fn on_sticker<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&VStickerMessage) + Send + Sync + 'static {
+    self.listener.on_sticker(fnc);
+    self
+  }
+
+  pub fn on_document<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&VDocumentMessage) + Send + Sync + 'static {
+    self.listener.on_document(fnc);
     self
   }
 

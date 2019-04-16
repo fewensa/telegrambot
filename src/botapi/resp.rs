@@ -2,7 +2,8 @@ use error_chain_mini::ErrorKind;
 use serde::de::{Deserialize, DeserializeOwned, Deserializer, Error};
 
 use crate::errors::{TGBotError, TGBotErrorKind};
-use crate::types::True;
+use crate::tglog;
+use crate::types::{RawMessage, True};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
 pub struct HttpResp {
@@ -59,6 +60,7 @@ impl<R: JsonResp> TGResp for R where <R as JsonResp>::Raw: DeserializeOwned {
         Ok(raw) => {
           match raw {
             RespWrapper::Success { result } => {
+//              Ok(<Self as JsonResp>::map(result))
               Ok(<Self as JsonResp>::map(result))
             }
             RespWrapper::Error { description, parameters } => {
@@ -68,6 +70,8 @@ impl<R: JsonResp> TGResp for R where <R as JsonResp>::Raw: DeserializeOwned {
         }
         Err(error) => Err(TGBotErrorKind::JsonError(error).into_err())
       }
+
+//      Err(TGBotErrorKind::EmptyBody.into_err())
     } else {
       Err(TGBotErrorKind::EmptyBody.into_err())
     }
@@ -132,3 +136,5 @@ pub struct RespParas {
   /// before the request can be repeated.
   pub retry_after: Option<i64>,
 }
+
+

@@ -1,5 +1,5 @@
 use crate::types::chat::User;
-use crate::types::message::Message;
+use crate::types::message::RawMessage;
 use crate::types::refs::CallbackQueryId;
 
 /// This object represents an incoming callback query from a callback button in an inline keyboard.
@@ -11,7 +11,7 @@ pub struct CallbackQuery {
   pub from: User,
   /// Message with the callback button that originated the query.
   /// Note that message content and message date will not be available if the message is too old
-  pub message: Message,
+  pub message: RawMessage,
   /// Global identifier, uniquely corresponding to the chat to which the message
   /// with the callback button was sent. Useful for high scores in games.
   pub chat_instance: String,

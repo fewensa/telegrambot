@@ -23,7 +23,8 @@ pub fn run(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
 fn polling(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
   let stream = UpdatesStream::new(cfg.clone());
   let future = stream.for_each(move |update| {
-    TGAdvancedHandler::new(cfg.clone(), lout.clone(), update).handle();
+    TGAdvancedHandler::new(cfg.clone(), lout.clone())
+      .handle(update);
     Ok(())
   }).map_err(|e| {
     // todo: some error handle.

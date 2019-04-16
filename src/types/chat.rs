@@ -13,6 +13,8 @@ pub struct User {
   pub last_name: Option<String>,
   /// User‘s or bot’s username.
   pub username: Option<String>,
+  /// User is bot
+  pub is_bot: Option<bool>
 }
 
 /// This object represents a group.
@@ -49,6 +51,7 @@ pub struct Channel {
 }
 
 /// This object represents a private, group or supergroup.
+// todo: necessity
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
 pub enum MessageChat {
   Private(User),
@@ -114,6 +117,7 @@ impl<'de> Deserialize<'de> for Chat {
           username: raw.username,
           first_name: required_field!(first_name),
           last_name: raw.last_name,
+          is_bot: raw.is_bot
         })
       }
       "group" => {
@@ -160,4 +164,6 @@ pub struct RawChat {
   pub last_name: Option<String>,
   /// True if a group has ‘All Members Are Admins’ enabled.
   pub all_members_are_administrators: Option<bool>,
+  /// Is bot
+  pub is_bot: Option<bool>
 }

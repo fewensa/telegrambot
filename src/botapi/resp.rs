@@ -3,7 +3,7 @@ use serde::de::{Deserialize, DeserializeOwned, Deserializer, Error};
 
 use crate::errors::{TGBotError, TGBotErrorKind};
 use crate::tglog;
-use crate::types::{RawMessage, True};
+use crate::types::True;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
 pub struct HttpResp {

@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use crate::advanced::Track;
 use crate::types::{Audio, Document, MessageEntity, PhotoSize, Update};
-use crate::vision::{Message, VAudioMessage, VChatPhotoMessage, VChatTitleMessage, VContactMessage, VDocumentMessage, VLeftChatMemberMessage, VLocationMessage, VMigrateFromChatIdMessage, VMigrateToChatIdMessage, VNewChatMembersMessage, VPhotoMessage, VPinnedMessageMessage, VStickerMessage, VTextMessage, VVenueMessage, VVideoMessage, VVideoNoteMessage, VVoiceMessage};
+use crate::vision::*;
 
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub enum ListenerType {

@@ -18,13 +18,6 @@ fn main() {
 //    .on_update(|update| {
 //      println!("{:?}", update);
 //    })
-//    .on_text_message(|(message, edited)| {
-//      match edited {
-//        false => println!("POST {:#?}", message),
-//        true => println!("EDITED {:#?}", message)
-//      }
-//      api::get_me();
-//    })
     .on_text(|message| {
       println!("=====> TEXT: {:?}", message);
     })

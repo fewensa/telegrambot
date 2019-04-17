@@ -11,6 +11,8 @@ use crate::listener::Lout;
 use crate::stream::UpdatesStream;
 use crate::tglog;
 use crate::api::BotApi;
+use crate::api::rawreq::RawReq;
+use std::rc::Rc;
 
 pub fn run(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
   match cfg.mode() {
@@ -21,12 +23,17 @@ pub fn run(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
 
 
 fn polling(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
-  let stream = UpdatesStream::new(cfg.clone());
-  let api = Arc::new(BotApi::new(cfg.clone()));
+  let token = cfg.token();
+  let client = cfg.client();
+  let rawreq = RawReq::new(Arc::new(client), token);
+  let api = BotApi::new(rawreq);
+  let stream = UpdatesStream::new(&api);
 
   let future = stream.for_each(move |update| {
-    TGAdvancedHandler::new(&cfg, &lout, &api)
-      .handle(update);
+//    TGAdvancedHandler::new(&cfg, &lout, &api)
+//      .handle(update);
+
+    debug!(tglog::telegram(), "UPDATE: {:?}", update);
     Ok(())
   }).map_err(|e| {
     // todo: some error handle.

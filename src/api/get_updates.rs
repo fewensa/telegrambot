@@ -1,8 +1,12 @@
 use std::sync::Arc;
 
-use crate::api::{tgkit, TGReq};
+use reqwest::Method;
+
+use crate::api::{TGReq};
+use crate::api::req::HttpReq;
 use crate::api::resp::{HttpResp, RespType};
 use crate::config::Config;
+use crate::errors::TGBotResult;
 use crate::tgfut::TGFuture;
 use crate::types::Update;
 
@@ -53,8 +57,8 @@ impl GetUpdates {
 impl TGReq for GetUpdates {
   type Resp = RespType<Vec<Update>>;
 
-  fn request(&self, cfg: Arc<Config>) -> TGFuture<HttpResp> {
-    tgkit::exec(cfg, "getUpdates", self)
+  fn request(&self) -> TGBotResult<HttpReq> {
+    HttpReq::json_req(Method::POST, "getUpdates", self)
   }
 }
 

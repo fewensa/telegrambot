@@ -1,5 +1,9 @@
 pub use self::message::*;
-pub use self::reply_message::*;
+pub use self::possibility::*;
+pub use self::callback_query::*;
+pub use self::command::*;
 
 mod message;
-mod reply_message;
+mod possibility;
+mod callback_query;
+mod command;

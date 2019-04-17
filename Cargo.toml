@@ -34,3 +34,5 @@ slog = "2.4.1"
 slog-term = "2.4.0"
 lazy_static = "1.3.0"
 
+text-reader = "0.1.1"
+rstring-builder = "0.1.3"

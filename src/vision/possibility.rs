@@ -3,14 +3,14 @@ use crate::types::RawMessage;
 use crate::vision::message::*;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub struct VReplyToMessage {
+pub struct PossibilityMessage {
   raw: RawMessage
 }
 
-impl VReplyToMessage {
-  pub fn new(raw: Box<RawMessage>) -> Self {
-    VReplyToMessage {
-      raw: *raw
+impl PossibilityMessage {
+  pub fn new(raw: RawMessage) -> Self {
+    PossibilityMessage {
+      raw
     }
   }
 

@@ -6,7 +6,7 @@ use crate::botrun;
 use crate::config::Config;
 use crate::errors::{TGBotErrorKind, TGBotResult};
 use crate::listener::{Listener, Lout};
-use crate::types::{Update};
+use crate::types::Update;
 use crate::vision::*;
 
 pub struct TelegramBot {
@@ -25,6 +25,30 @@ impl TelegramBot {
     })
   }
 
+  pub fn on_start<F>(&mut self, fnc: F) -> &mut Self where
+    F: Fn(&VCommand) + Send + Sync + 'static {
+    self.listener.on_command("/start", fnc);
+    self
+  }
+
+  pub fn on_command<S, F>(&mut self, command: S, fnc: F) -> &mut Self where
+    S: AsRef<str> + 'static,
+    F: Fn(&VCommand) + Send + Sync + 'static {
+    self.listener.on_command(command, fnc);
+    self
+  }
+
+  pub fn on_callback_query<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&VCallbackQuery) + Send + Sync + 'static {
+    self.listener.on_callback_query(fnc);
+    self
+  }
+
+  pub fn on_error<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&String) + Send + Sync + 'static {
+    self.listener.on_error(fnc);
+    self
+  }
+
+
   pub fn on_update<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&Update) + Send + Sync + 'static {
     self.listener.on_update(fnc);
     self
@@ -39,8 +63,6 @@ impl TelegramBot {
     self.listener.on_audio(fnc);
     self
   }
-
-
 
 
   pub fn on_document<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&VDocumentMessage) + Send + Sync + 'static {

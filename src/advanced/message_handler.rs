@@ -4,10 +4,10 @@ use crate::listener::Lout;
 use crate::tglog;
 use crate::types::*;
 use crate::vision::*;
+use crate::advanced::text_handler;
 
 pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
   let message = to_message(raw);
-  debug!(tglog::advanced(), "IS_EDITED: {}, ADV MESSAGE: {:?}", is_edited, message);
 
 
   macro_rules! maybe_field {
@@ -69,13 +69,9 @@ pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
     }}
   }
 
-  if let Some(fnc) = lout.listen_text() {
-    if let Some(text) = &raw.text {
-      let entities = raw.entities.clone().unwrap_or_else(|| Vec::with_capacity(0));
-      let obj = VTextMessage { message, text: text.clone(), entities };
-      (*fnc)(&obj);
-      return;
-    }
+  if let Some(_) = &raw.text {
+    text_handler::handle_text(lout, raw, message);
+    return;
   }
 
 
@@ -111,7 +107,7 @@ pub fn to_message(raw: &RawMessage) -> Message {
     date: raw.date,
 //    chat: raw.chat.clone(),
     forward: gen_forward(&raw),
-    reply_to_message: raw.reply_to_message.clone().map(|raw| VReplyToMessage::new(raw)),
+    reply_to_message: raw.reply_to_message.clone().map(|raw| PossibilityMessage::new(*raw)),
     edit_date: raw.edit_date,
     chat: gen_chat(raw),
   }

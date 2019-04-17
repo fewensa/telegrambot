@@ -5,7 +5,7 @@ use crate::config::Config;
 use crate::listener::Lout;
 use crate::tglog;
 use crate::types::{Update, UpdateKind, RawMessage};
-use crate::vision::VMessagChat;
+use crate::vision::{VMessagChat, VCallbackQuery, PossibilityMessage};
 
 pub struct TGAdvancedHandler {
   cfg: Arc<Config>,
@@ -28,19 +28,57 @@ impl TGAdvancedHandler {
 
     match &update.kind {
       UpdateKind::Message(ref raw) => {
+        info!(tglog::advanced(), "{} | INCOMMING MESSAGE: {:?}", if update.is_edited { "EDITED" } else { "POST" }, raw);
         message_handler::handle( &self.lout, raw, update.is_edited);
+        return;
       },
       UpdateKind::Channel(ref raw) => {
+        info!(tglog::advanced(), "{} | INCOMMING CHANNEL MESSAGE: {:?}", if update.is_edited { "EDITED" } else { "POST" }, raw);
         message_handler::handle(&self.lout, raw, update.is_edited);
+        return;
       },
       UpdateKind::CallbackQuery(ref callback_query) => {
-        debug!(tglog::advanced(), "CALLBACK_QUERY: {:?}", callback_query);
+        info!(tglog::advanced(), "INCOMMING CALLBACK_QUERY: {:?}", callback_query);
+        if let Some(fnc) = self.lout.listen_callback_query() {
+          let vcq = VCallbackQuery {
+            id: callback_query.id.clone(),
+            from: callback_query.from.clone(),
+            message: PossibilityMessage::new(callback_query.message.clone()),
+            chat_instance: callback_query.chat_instance.clone(),
+            data: callback_query.data.clone()
+          };
+          (*fnc)(&vcq);
+          return;
+        }
       },
       UpdateKind::Err(ref err) => {
-        debug!(tglog::advanced(), "ERR: {:?}", err);
+        error!(tglog::advanced(), "Happen error for update: {:?}, you can post an issue to: https://github.com/fewensa/telegrambot/issues   (include error log)", err);
+        error!(tglog::advanced(), "=====================================================");
+        error!(tglog::advanced(), "ERROR LOG START");
+        error!(tglog::advanced(), "=====================================================");
+        error!(tglog::advanced(), "UPDATE: {:#?}", update);
+        error!(tglog::advanced(), "=====================================================");
+        error!(tglog::advanced(), "ERROR LOG END");
+        error!(tglog::advanced(), "=====================================================");
+        if let Some(fnc) = self.lout.listen_error() {
+          (&fnc)(err);
+          return;
+        }
       },
       UpdateKind::Unknown => {
-        error!(tglog::advanced(), "Not support update type.")
+        let notice = "Not support update type. please post an issue to: https://github.com/fewensa/telegrambot/issues   (include error log)".to_string();
+        error!(tglog::advanced(), "{:?}", notice);
+        error!(tglog::advanced(), "=====================================================");
+        error!(tglog::advanced(), "ERROR LOG START");
+        error!(tglog::advanced(), "=====================================================");
+        error!(tglog::advanced(), "UPDATE: {:#?}", update);
+        error!(tglog::advanced(), "=====================================================");
+        error!(tglog::advanced(), "ERROR LOG END");
+        error!(tglog::advanced(), "=====================================================");
+        if let Some(fnc) = self.lout.listen_error() {
+          (&fnc)(&notice);
+          return;
+        }
       }
     };
 

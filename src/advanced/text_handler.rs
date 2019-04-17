@@ -1,60 +1,134 @@
-//use std::sync::Arc;
-//
-//use crate::tglog;
-//use crate::advanced::Track;
-//use crate::listener::Lout;
-//use crate::vision::TextMessage;
-//use crate::types::MessageEntity;
-//
-////#[derive(Debug, Clone, Eq, PartialEq, PartialOrd, Hash)]
-////enum MessageEntityKind {
-////  Mention,
-////  Hashtag,
-////  BotCommand,
-////  Url,
-////  Email,
-////  Bold,
-////  Italic,
-////  Code,
-////  Pre,
-////  TextLink,
-////  // TODO(knsd) URL?
-////  TextMention,
-////  #[doc(hidden)]
-////  Unknown,
-////}
-//
-//
-//pub fn handle_message(update_id: i64, edited: bool,
-//                      message: &Message, data: &String, entities: &Vec<MessageEntity>,
-//                      lout: &Arc<Lout>) {
-//  debug!(tglog::advanced(), "DATA: {:?} ENTITIES: {:?}", data, entities);
-//
-////  let listen_text = lout.listen_text(Track::Message);
-////  if let None = listen_text {
-////    return;
-////  }
-////  let listen_text = listen_text.unwrap();
-////
-////  let atm = TextMessage {
-////    id: message.id.clone(),
-////    from: message.from.clone(),
-////    date: message.date,
-////    chat: message.chat.clone(),
-////    forward: message.forward.clone(),
-////    reply_to_message: message.reply_to_message.clone(),
-////    edit_date: message.edit_date,
-////    text: data.clone(),
-////    entities: entities.clone()
-////  };
-////  debug!(tglog::advanced(), "TextMessage: {:?}", atm);
-////  (*listen_text)((&atm, edited));
-//}
-//
-//pub fn handle_channel_post(update_id: i64, edited: bool,
-//                           message: &ChannelPost, data: &String, entities: &Vec<MessageEntity>,
-//                           lout: &Arc<Lout>) {
-//
-//}
-//
-//
+use std::sync::Arc;
+use crate::listener::Lout;
+use crate::types::{RawMessage, MessageEntityKind};
+use crate::vision::{Message, VTextMessage, VCommand};
+use text_reader::TextReader;
+use rstring_builder::StringBuilder;
+use crate::tglog;
+
+pub fn handle_text(lout: &Arc<Lout>, raw: &RawMessage, message: Message) {
+  let text = raw.text.clone().unwrap();
+  let entities = raw.entities.clone().unwrap_or_else(|| Vec::with_capacity(0));
+
+  if entities.is_empty() {
+    if let Some(fnc) = lout.listen_text() {
+      let obj = VTextMessage { message, text, entities };
+      (*fnc)(&obj);
+      return;
+    }
+  }
+
+  let first = entities.get(0).unwrap();
+  if first.kind == MessageEntityKind::BotCommand {
+    handle_command(lout, raw, message, &text);
+  }
+}
+
+fn handle_command(lout: &Arc<Lout>, raw: &RawMessage, message: Message, text: &String) {
+  let (command, args) = extra_command(text);
+  debug!(tglog::advanced(), "COMMAND: {:?} => ARGS: {:?}", command, args);
+
+  let lcd = lout.listen_command();
+  if let Some(fnc) = lcd.get(&command[..]) {
+    let vcmd = VCommand {
+      message,
+      text: "".to_string(),
+      entities: vec![],
+      command: "".to_string(),
+      args: vec![]
+    };
+    (*fnc)(&vcmd);
+  }
+}
+
+
+fn extra_command(text: &String) -> (String, Vec<String>) {
+  let mut reader = TextReader::new(text);
+  let mut command = "".to_string();
+  let mut builder = StringBuilder::new();
+  let mut args = Vec::new();
+
+  let mut entry_command = false;
+  let mut check_command = false;
+  let mut quote_ch = None;
+  let mut entry_quote = false;
+  while reader.has_next() {
+    match reader.next() {
+      Some('/') => {
+        if reader.position() == 1 {
+          entry_command = true;
+          continue;
+        }
+        builder.append('/');
+      }
+      Some('\'') => {
+        if entry_command {
+          builder.append('\'');
+          continue;
+        }
+        if entry_quote {
+          if quote_ch == Some('\'') {
+            quote_ch = None;
+            entry_quote = false;
+            continue;
+          }
+          builder.append('\'');
+          continue;
+        }
+        quote_ch = Some('\'');
+        entry_quote = true;
+        continue;
+      }
+      Some('"') => {
+        if entry_command {
+          builder.append('"');
+          continue;
+        }
+        if entry_quote {
+          if quote_ch == Some('"') {
+            quote_ch = None;
+            entry_quote = false;
+            continue;
+          }
+          builder.append('"');
+          continue;
+        }
+        quote_ch = Some('"');
+        entry_quote = true;
+        continue;
+      }
+      Some(' ') => {
+        if entry_quote {
+          builder.append(' ');
+          continue;
+        }
+        if entry_command {
+          entry_command = false;
+          check_command = true;
+          command = builder.string();
+          builder.clear();
+          continue;
+        }
+        if !entry_command {
+          args.push(builder.string());
+          builder.clear();
+          continue;
+        }
+        continue;
+      }
+      Some(ch) => {
+        builder.append(ch);
+      }
+      _ => {}
+    }
+  }
+
+  if entry_command {
+    command = builder.string();
+  } else {
+    args.push(builder.string());
+  }
+  builder.clear();
+
+  (command, args)
+}

@@ -18,25 +18,34 @@ fn main() {
 //    .on_update(|update| {
 //      println!("{:?}", update);
 //    })
-    .on_text(|message| {
-      if let Some(reply) = &message.message.reply_to_message {
-        reply.on_text(|vtm| {
-          println!("<<<<<=====>>>> replay text message {:?}", vtm);
+    .on_text(|vtex| {
+      if let Some(reply) = &vtex.message.reply_to_message {
+        reply.on_text(|vtex| {
+          println!("<<<<<=====>>>> replay text message {:?}", vtex);
         })
-          .on_sticker(|vsm| {
-            println!("<<<<<=====>>>> replay sticker message {:?}", vsm);
+          .on_sticker(|vtex| {
+            println!("<<<<<=====>>>> replay sticker message {:?}", vtex);
           });
       }
-      println!("=====> TEXT: {:?}", message);
+      println!("=====> TEXT: {:?}", vtex);
     })
-    .on_sticker(|message| {
-      println!("=====> STICKER: {:?}", message);
+    .on_sticker(|sti| {
+      println!("=====> STICKER: {:?}", sti);
     })
-    .on_photo(|message| {
-      println!("=====> PHOTO: {:?}", message);
+    .on_photo(|pho| {
+      println!("=====> PHOTO: {:?}", pho);
     })
-    .on_document(|message| {
-      println!("=====> DOCUMENT: {:?}", message);
+    .on_document(|doc| {
+      println!("=====> DOCUMENT: {:?}", doc);
+    })
+    .on_callback_query(|cq| {
+      println!("=====> DOCUMENT: {:?}", cq);
+    })
+    .on_command("/start",|cmd| {
+      println!("=====> COMMAND /start  {:?}", cmd);
+    })
+    .on_command("/list",|cmd| {
+      println!("=====> COMMAND /list  {:?}", cmd);
     })
     .start()
     .unwrap();

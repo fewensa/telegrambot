@@ -1,7 +1,8 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use crate::advanced::Track;
-use crate::types::{Update};
+use crate::types::Update;
 use crate::vision::*;
 
 #[derive(Debug, Eq, PartialEq, Hash)]
@@ -37,6 +38,11 @@ pub struct Listener {
   migrate_to_chat_id_handler: Option<Arc<Box<dyn Fn(&VMigrateToChatIdMessage) + Send + Sync + 'static>>>,
   migrate_from_chat_id_handler: Option<Arc<Box<dyn Fn(&VMigrateFromChatIdMessage) + Send + Sync + 'static>>>,
   pinned_message_handler: Option<Arc<Box<dyn Fn(&VPinnedMessageMessage) + Send + Sync + 'static>>>,
+
+  callback_query_handler: Option<Arc<Box<dyn Fn(&VCallbackQuery) + Send + Sync + 'static>>>,
+  error_handler: Option<Arc<Box<dyn Fn(&String) + Send + Sync + 'static>>>,
+
+  command_handler: HashMap<&'static str, Arc<Box<dyn Fn(&VCommand) + Send + Sync + 'static>>>,
 }
 
 impl Default for Listener {
@@ -65,6 +71,9 @@ impl Default for Listener {
       migrate_to_chat_id_handler: None,
       migrate_from_chat_id_handler: None,
       pinned_message_handler: None,
+      callback_query_handler: None,
+      error_handler: None,
+      command_handler: HashMap::new(),
     }
   }
 }
@@ -76,11 +85,26 @@ impl Listener {
     self
   }
 
-  pub fn on_callback_query(&mut self) -> &mut Self {
+  pub fn on_callback_query<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&VCallbackQuery) + Send + Sync + 'static {
+    self.callback_query_handler = Some(Arc::new(Box::new(fnc)));
     self
   }
 
-  pub fn on_command(&mut self, track: Track) -> &mut Self {
+  pub fn on_error<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&String) + Send + Sync + 'static {
+    self.error_handler = Some(Arc::new(Box::new(fnc)));
+    self
+  }
+
+
+  pub fn on_command<S, F>(&mut self, command: S, fnc: F) -> &mut Self where
+    S: AsRef<str> + 'static,
+    F: Fn(&VCommand) + Send + Sync + 'static {
+    let mut command = command.as_ref();
+    if command.starts_with("/") {
+      command = &command[1..];
+    }
+    let command: &'static str = Box::leak(command.to_string().into_boxed_str());
+    self.command_handler.insert(command, Arc::new(Box::new(fnc)));
     self
   }
 
@@ -93,10 +117,6 @@ impl Listener {
     self.audio_handler = Some(Arc::new(Box::new(fnc)));
     self
   }
-
-
-
-
 
 
   pub fn on_document<F>(&mut self, fnc: F) -> &mut Self where F: Fn(&VDocumentMessage) + Send + Sync + 'static {
@@ -198,12 +218,6 @@ impl Listener {
     self.pinned_message_handler = Some(Arc::new(Box::new(fnc)));
     self
   }
-
-
-
-  pub fn on_error(&mut self) -> &mut Self {
-    self
-  }
 }
 
 pub struct Lout {
@@ -213,6 +227,18 @@ pub struct Lout {
 impl Lout {
   pub fn new(listener: Listener) -> Self {
     Lout { listener }
+  }
+
+  pub fn listen_command(&self) -> &HashMap<&'static str, Arc<Box<dyn Fn(&VCommand) + Send + Sync + 'static>>> {
+    &self.listener.command_handler
+  }
+
+  pub fn listen_error(&self) -> &Option<Arc<Box<dyn Fn(&String) + Send + Sync + 'static>>> {
+    &self.listener.error_handler
+  }
+
+  pub fn listen_callback_query(&self) -> &Option<Arc<Box<dyn Fn(&VCallbackQuery) + Send + Sync + 'static>>> {
+    &self.listener.callback_query_handler
   }
 
   pub fn listen_update(&self) -> &Option<Arc<Box<dyn Fn(&Update) + Send + Sync + 'static>>> {

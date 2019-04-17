@@ -1,5 +1,5 @@
 use crate::types::*;
-use crate::vision::reply_message::VReplyToMessage;
+use crate::vision::possibility::PossibilityMessage;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Message {
@@ -15,7 +15,7 @@ pub struct Message {
   pub forward: Option<Forward>,
   /// For replies, the original message. Note that the Message object in this field will not
   /// contain further reply_to_message fields even if it itself is a reply.
-  pub reply_to_message: Option<VReplyToMessage>,
+  pub reply_to_message: Option<PossibilityMessage>,
   /// Date the message was last edited in Unix time.
   pub edit_date: Option<i64>,
   /// Message kind, Message | Channel

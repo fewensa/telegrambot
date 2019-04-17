@@ -11,63 +11,63 @@ pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
 
 
   macro_rules! maybe_field {
-      ($name:ident, $variant:ident, $field:ident, $fnc:ident) => {{
+    ($name:ident, $variant:ident, $field:ident, $fnc:ident) => {{
+      if let Some(val) = &raw.$name {
+        let obj = $variant {
+          message,
+          $field: val.clone(),
+        };
+        if let Some(fnc) = lout.$fnc() {
+          (*fnc)(&obj);
+        }
+        return;
+      }
+    }}
+  }
+
+  macro_rules! maybe_field_with_caption {
+    ($name:ident, $variant:ident, $field:ident, $fnc:ident) => {{
+      if let Some(fnc) = lout.$fnc() {
         if let Some(val) = &raw.$name {
           let obj = $variant {
             message,
             $field: val.clone(),
+            caption: raw.caption.clone(),
           };
-          if let Some(fnc) = lout.$fnc() {
-            (*fnc)(&obj);
-          }
+          (*fnc)(&obj);
           return;
         }
-      }}
-    }
-
-  macro_rules! maybe_field_with_caption {
-      ($name:ident, $variant:ident, $field:ident, $fnc:ident) => {{
-        if let Some(fnc) = lout.$fnc() {
-          if let Some(val) = &raw.$name {
-            let obj = $variant {
-              message,
-              $field: val.clone(),
-              caption: raw.caption.clone(),
-            };
-            (*fnc)(&obj);
-            return;
-          }
-        }
-      }}
-    }
+      }
+    }}
+  }
 
   macro_rules! maybe_field_with_caption_and_group {
-      ($name:ident, $variant:ident, $field:ident, $fnc:ident) => {{
-        if let Some(fnc) = lout.$fnc() {
-          if let Some(val) = &raw.$name {
-            let obj = $variant {
-              message,
-              $field: val.clone(),
-              caption: raw.caption.clone(),
-              media_group_id: raw.media_group_id.clone()
-            };
-            (*fnc)(&obj);
-            return;
-          }
+    ($name:ident, $variant:ident, $field:ident, $fnc:ident) => {{
+      if let Some(fnc) = lout.$fnc() {
+        if let Some(val) = &raw.$name {
+          let obj = $variant {
+            message,
+            $field: val.clone(),
+            caption: raw.caption.clone(),
+            media_group_id: raw.media_group_id.clone()
+          };
+          (*fnc)(&obj);
+          return;
         }
-      }}
-    }
+      }
+    }}
+  }
 
   macro_rules! maybe_true_field {
-      ($name:ident, $fnc:ident) => {{
-        if let Some(fnc) = lout.$fnc() {
-          if let Some(True) = &raw.$name {
-            (*fnc)(&message);
-            return;
-          }
+    ($name:ident, $fnc:ident) => {{
+      if let Some(fnc) = lout.$fnc() {
+        if let Some(True) = &raw.$name {
+          (*fnc)(&message);
+          return;
         }
-      }}
-    }
+      }
+    }}
+  }
 
   if let Some(fnc) = lout.listen_text() {
     if let Some(text) = &raw.text {
@@ -104,26 +104,26 @@ pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
 }
 
 
-fn to_message(raw: &RawMessage) -> Message {
+pub fn to_message(raw: &RawMessage) -> Message {
   Message {
     id: raw.message_id,
     from: raw.from.clone(),
     date: raw.date,
 //    chat: raw.chat.clone(),
     forward: gen_forward(&raw),
-    reply_to_message: raw.reply_to_message.clone(),
+    reply_to_message: raw.reply_to_message.clone().map(|raw| VReplyToMessage::new(raw)),
     edit_date: raw.edit_date,
-    archive: gen_archive(raw),
+    chat: gen_chat(raw),
   }
 }
 
-fn gen_archive(raw: &RawMessage) -> MessageArchive {
+fn gen_chat(raw: &RawMessage) -> VMessagChat {
   match raw.chat {
-    Chat::Channel(ref channel) => MessageArchive::Channel(channel.clone()),
-    Chat::Private(ref user) => MessageArchive::Message(MessageChat::Private(user.clone())),
-    Chat::Group(ref group) => MessageArchive::Message(MessageChat::Group(group.clone())),
-    Chat::Supergroup(ref supergroup) => MessageArchive::Message(MessageChat::Supergroup(supergroup.clone())),
-    Chat::Unknown(ref rawchat) => MessageArchive::Message(MessageChat::Unknown(rawchat.clone()))
+    Chat::Channel(ref channel) => VMessagChat::Channel(channel.clone()),
+    Chat::Private(ref user) => VMessagChat::Message(MessageChat::Private(user.clone())),
+    Chat::Group(ref group) => VMessagChat::Message(MessageChat::Group(group.clone())),
+    Chat::Supergroup(ref supergroup) => VMessagChat::Message(MessageChat::Supergroup(supergroup.clone())),
+    Chat::Unknown(ref rawchat) => VMessagChat::Message(MessageChat::Unknown(rawchat.clone()))
   }
 }
 

@@ -6,7 +6,7 @@ use crate::botrun;
 use crate::config::Config;
 use crate::errors::{TGBotErrorKind, TGBotResult};
 use crate::listener::{Listener, Lout};
-use crate::types::{MessageEntity, Update};
+use crate::types::{Update};
 use crate::vision::*;
 
 pub struct TelegramBot {

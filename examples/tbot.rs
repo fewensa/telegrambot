@@ -1,7 +1,7 @@
 use std::env;
 
-use rbotele::{api, TelegramBot};
-use rbotele::config::Config;
+use telegrambot::{api, TelegramBot};
+use telegrambot::config::Config;
 
 fn main() {
   let token = env::var("TELEGRAM_BOT_TOKEN").unwrap();
@@ -19,6 +19,14 @@ fn main() {
 //      println!("{:?}", update);
 //    })
     .on_text(|message| {
+      if let Some(reply) = &message.message.reply_to_message {
+        reply.on_text(|vtm| {
+          println!("<<<<<=====>>>> replay text message {:?}", vtm);
+        })
+          .on_sticker(|vsm| {
+            println!("<<<<<=====>>>> replay sticker message {:?}", vsm);
+          });
+      }
       println!("=====> TEXT: {:?}", message);
     })
     .on_sticker(|message| {

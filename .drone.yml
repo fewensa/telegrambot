@@ -7,7 +7,7 @@ steps:
   - name: sync_push
     image: alpine/git:1.0.7
     environment:
-      REPO_REMOTE: https://github.com/fewensa/rbotele.git
+      REPO_REMOTE: https://github.com/fewensa/telegrambot.git
     volumes:
       - name: git_credentials
         path: /root/.git-credentials
@@ -23,7 +23,7 @@ steps:
   - name: sync_tag
     image: alpine/git:1.0.7
     environment:
-      REPO_REMOTE: https://github.com/fewensa/rbotele.git
+      REPO_REMOTE: https://github.com/fewensa/telegrambot.git
     volumes:
       - name: git_credentials
         path: /root/.git-credentials

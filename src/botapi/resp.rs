@@ -2,7 +2,6 @@ use error_chain_mini::ErrorKind;
 use serde::de::{Deserialize, DeserializeOwned, Deserializer, Error};
 
 use crate::errors::{TGBotError, TGBotErrorKind};
-use crate::tglog;
 use crate::types::True;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]

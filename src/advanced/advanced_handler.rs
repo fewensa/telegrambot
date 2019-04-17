@@ -4,7 +4,8 @@ use crate::advanced::message_handler;
 use crate::config::Config;
 use crate::listener::Lout;
 use crate::tglog;
-use crate::types::{Chat, Forward, ForwardFrom, RawMessage, Update, UpdateKind};
+use crate::types::{Update, UpdateKind, RawMessage};
+use crate::vision::VMessagChat;
 
 pub struct TGAdvancedHandler {
   cfg: Arc<Config>,
@@ -25,16 +26,24 @@ impl TGAdvancedHandler {
       return;
     }
 
-    if let Some(raw) = &update.message {
-      message_handler::handle(&self.lout, raw, update.is_edited);
-      return;
-    }
-    if let Some(callback_query) = &update.callback_query {
-      debug!(tglog::advanced(), "CALLBACK_QUERY: {:?}", callback_query);
-    }
-    if let Some(err) = &update.error {
-      debug!(tglog::advanced(), "ERR: {:?}", err);
-    }
+    match &update.kind {
+      UpdateKind::Message(ref raw) => {
+        message_handler::handle( &self.lout, raw, update.is_edited);
+      },
+      UpdateKind::Channel(ref raw) => {
+        message_handler::handle(&self.lout, raw, update.is_edited);
+      },
+      UpdateKind::CallbackQuery(ref callback_query) => {
+        debug!(tglog::advanced(), "CALLBACK_QUERY: {:?}", callback_query);
+      },
+      UpdateKind::Err(ref err) => {
+        debug!(tglog::advanced(), "ERR: {:?}", err);
+      },
+      UpdateKind::Unknown => {
+        error!(tglog::advanced(), "Not support update type.")
+      }
+    };
 
   }
 }
+

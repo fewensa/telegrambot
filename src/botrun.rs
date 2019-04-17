@@ -10,7 +10,6 @@ use crate::errors::{TGBotErrorKind, TGBotResult};
 use crate::listener::Lout;
 use crate::stream::UpdatesStream;
 use crate::tglog;
-use crate::types::Update;
 
 pub fn run(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
   match cfg.mode() {

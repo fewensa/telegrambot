@@ -1,9 +1,7 @@
-use std::collections::HashMap;
-use std::rc::Rc;
 use std::sync::Arc;
 
 use crate::advanced::Track;
-use crate::types::{Audio, Document, MessageEntity, PhotoSize, Update};
+use crate::types::{Update};
 use crate::vision::*;
 
 #[derive(Debug, Eq, PartialEq, Hash)]

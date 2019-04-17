@@ -13,20 +13,20 @@ pub struct Update {
   /// positive number and increase sequentially.
 //  #[serde(rename = "update_id")]
   pub id: i64,
-  pub message: Option<RawMessage>,
-  pub callback_query: Option<CallbackQuery>,
+//  pub message: Option<RawMessage>,
+//  pub callback_query: Option<CallbackQuery>,
   pub is_edited: bool,
-  pub error: Option<String>,
+//  pub error: Option<String>,
   pub kind: UpdateKind,
 }
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum UpdateKind {
-  Message,
-  Channel,
-  CallbackQuery,
+  Message(RawMessage),
+  Channel(RawMessage),
+  CallbackQuery(CallbackQuery),
   #[doc(hidden)]
-  Err,
+  Err(String),
   #[doc(hidden)]
   Unknown,
 }
@@ -121,11 +121,8 @@ impl<'de> Deserialize<'de> for Update {
             if let Some(err) = error {
               return Ok(Update {
                 id: update_id,
-                message: None,
-                callback_query: None,
                 is_edited: false,
-                error: Some(format!("{}", err)),
-                kind: UpdateKind::Err
+                kind: UpdateKind::Err(format!("{}", err))
               })
             }
 
@@ -133,21 +130,15 @@ impl<'de> Deserialize<'de> for Update {
               if let Some(val) = $name {
                 return Ok(Update {
                   id: update_id,
-                  message: Some(val),
-                  callback_query: None,
                   is_edited: $is_edit,
-                  error: None,
-                  kind: UpdateKind::$kind,
+                  kind: UpdateKind::$kind(val),
                 })
               }
             )*
 
             return Ok(Update {
                 id: update_id,
-                message: None,
-                callback_query: None,
                 is_edited: false,
-                error: None,
                 kind: UpdateKind::Unknown,
             })
           }};

@@ -1,5 +1,5 @@
 pub use self::message::*;
-pub use self::tgwrapper::*;
+pub use self::reply_message::*;
 
 mod message;
-mod tgwrapper;
+mod reply_message;

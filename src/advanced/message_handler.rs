@@ -6,15 +6,7 @@ use crate::types::*;
 use crate::vision::*;
 
 pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
-  let message = Message {
-    id: raw.message_id,
-    from: raw.from.clone(),
-    date: raw.date,
-    chat: raw.chat.clone(),
-    forward: gen_forward(&raw),
-    reply_to_message: raw.reply_to_message.clone(),
-    edit_date: raw.edit_date,
-  };
+  let message = to_message(raw);
   debug!(tglog::advanced(), "IS_EDITED: {}, ADV MESSAGE: {:?}", is_edited, message);
 
 
@@ -87,30 +79,53 @@ pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
   }
 
 
-  maybe_field!(audio, VAudioMessage, audio, listen_audio);
-  maybe_field_with_caption!(document, VDocumentMessage, document, listen_document);
-  maybe_field_with_caption_and_group!(photo, VPhotoMessage, photo, listen_photo);
-  maybe_field!(sticker, VStickerMessage, sticker, listen_sticker);
-  maybe_field_with_caption_and_group!(video, VVideoMessage, video, listen_video);
-  maybe_field!(voice, VVoiceMessage, voice, listen_voice);
-  maybe_field!(video_note, VVideoNoteMessage, video_note, listen_video_note);
-  maybe_field!(contact, VContactMessage, contact, listen_contact);
-  maybe_field!(location, VLocationMessage, location, listen_location);
-  maybe_field!(venue, VVenueMessage, venue, listen_venue);
-  maybe_field!(new_chat_members, VNewChatMembersMessage, members, listen_new_chat_members);
-  maybe_field!(left_chat_member, VLeftChatMemberMessage, member, listen_left_chat_member);
-  maybe_field!(new_chat_title, VChatTitleMessage, title, listen_new_chat_title);
-  maybe_field!(new_chat_photo, VChatPhotoMessage, photos, listen_new_chat_photo);
-  maybe_true_field!(delete_chat_photo, listen_delete_chat_photo);
-  maybe_true_field!(group_chat_created, listen_group_chat_created);
-  maybe_true_field!(supergroup_chat_created, listen_supergroup_chat_created);
-  maybe_true_field!(channel_chat_created, listen_channel_chat_create);
-  maybe_field!(migrate_to_chat_id, VMigrateToChatIdMessage, migrate_to_chat_id, listen_migrate_to_chat);
-  maybe_field!(migrate_from_chat_id, VMigrateFromChatIdMessage, migrate_from_chat_id, listen_migrate_from_chat);
-  maybe_field!(pinned_message, VPinnedMessageMessage, pinned, listen_pinned);
+  maybe_field!                       ( audio,                   VAudioMessage,                   audio,                 listen_audio                    );
+  maybe_field_with_caption!          ( document,                VDocumentMessage,                document,              listen_document                 );
+  maybe_field_with_caption_and_group!( photo,                   VPhotoMessage,                   photo,                 listen_photo                    );
+  maybe_field!                       ( sticker,                 VStickerMessage,                 sticker,               listen_sticker                  );
+  maybe_field_with_caption_and_group!( video,                   VVideoMessage,                   video,                 listen_video                    );
+  maybe_field!                       ( voice,                   VVoiceMessage,                   voice,                 listen_voice                    );
+  maybe_field!                       ( video_note,              VVideoNoteMessage,               video_note,            listen_video_note               );
+  maybe_field!                       ( contact,                 VContactMessage,                 contact,               listen_contact                  );
+  maybe_field!                       ( location,                VLocationMessage,                location,              listen_location                 );
+  maybe_field!                       ( venue,                   VVenueMessage,                   venue,                 listen_venue                    );
+  maybe_field!                       ( new_chat_members,        VNewChatMembersMessage,          members,               listen_new_chat_members         );
+  maybe_field!                       ( left_chat_member,        VLeftChatMemberMessage,          member,                listen_left_chat_member         );
+  maybe_field!                       ( new_chat_title,          VChatTitleMessage,               title,                 listen_new_chat_title           );
+  maybe_field!                       ( new_chat_photo,          VChatPhotoMessage,               photos,                listen_new_chat_photo           );
+  maybe_true_field!                  ( delete_chat_photo,                                                               listen_delete_chat_photo        );
+  maybe_true_field!                  ( group_chat_created,                                                              listen_group_chat_created       );
+  maybe_true_field!                  ( supergroup_chat_created,                                                         listen_supergroup_chat_created  );
+  maybe_true_field!                  ( channel_chat_created,                                                            listen_channel_chat_create      );
+  maybe_field!                       ( migrate_to_chat_id,      VMigrateToChatIdMessage,         migrate_to_chat_id,    listen_migrate_to_chat          );
+  maybe_field!                       ( migrate_from_chat_id,    VMigrateFromChatIdMessage,       migrate_from_chat_id,  listen_migrate_from_chat        );
+  maybe_field!                       ( pinned_message,          VPinnedMessageMessage,           pinned,                listen_pinned                   );
 //    make_message(MessageKind::Unknown { raw: raw })
 }
 
+
+fn to_message(raw: &RawMessage) -> Message {
+  Message {
+    id: raw.message_id,
+    from: raw.from.clone(),
+    date: raw.date,
+//    chat: raw.chat.clone(),
+    forward: gen_forward(&raw),
+    reply_to_message: raw.reply_to_message.clone(),
+    edit_date: raw.edit_date,
+    archive: gen_archive(raw),
+  }
+}
+
+fn gen_archive(raw: &RawMessage) -> MessageArchive {
+  match raw.chat {
+    Chat::Channel(ref channel) => MessageArchive::Channel(channel.clone()),
+    Chat::Private(ref user) => MessageArchive::Message(MessageChat::Private(user.clone())),
+    Chat::Group(ref group) => MessageArchive::Message(MessageChat::Group(group.clone())),
+    Chat::Supergroup(ref supergroup) => MessageArchive::Message(MessageChat::Supergroup(supergroup.clone())),
+    Chat::Unknown(ref rawchat) => MessageArchive::Message(MessageChat::Unknown(rawchat.clone()))
+  }
+}
 
 fn gen_forward(raw: &RawMessage) -> Option<Forward> {
   match (raw.forward_date,

@@ -18,8 +18,8 @@ use crate::types::Update;
 const TELEGRAM_LONG_POLL_TIMEOUT_SECONDS: i64 = 5;
 const TELEGRAM_LONG_POLL_ERROR_DELAY_MILLISECONDS: u64 = 500;
 
-pub struct UpdatesStream {
-  cfg: Arc<Config>,
+pub struct UpdatesStream<'a> {
+  cfg: &'a Arc<Config>,
 //    interval: Interval,
   error_interval: Interval,
   last_update: i64,
@@ -27,8 +27,8 @@ pub struct UpdatesStream {
   botapi: Option<TGFuture<Option<Vec<Update>>>>,
 }
 
-impl UpdatesStream {
-  pub fn new(cfg: Arc<Config>) -> Self {
+impl<'a> UpdatesStream<'a> {
+  pub fn new(cfg: &'a Arc<Config>) -> Self {
     UpdatesStream {
       cfg,
 //      interval: Interval::new_interval(Duration::from_secs(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS)),
@@ -40,7 +40,7 @@ impl UpdatesStream {
   }
 }
 
-impl Stream for UpdatesStream {
+impl<'a> Stream for UpdatesStream<'a> {
   type Item = Update;
   type Error = TGBotError; // todo: do not return error, if happen error, wait and retry
 
@@ -51,11 +51,11 @@ impl Stream for UpdatesStream {
 
 //    try_ready!(self.interval.poll().map_err(|_| TGBotErrorKind::Other.into_with(|| "Interval error")));
 
-    let cfg = self.cfg.clone();
+//    let cfg = self.cfg.clone();
     let last_update = self.last_update;
 
     let upfut = self.botapi.get_or_insert_with(|| {
-      self::send(cfg, GetUpdates::new()
+      self::send(self.cfg, GetUpdates::new()
         .offset(last_update + 1)
         .timeout(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS))
     });
@@ -89,8 +89,8 @@ impl Stream for UpdatesStream {
   }
 }
 
-fn send<Req: TGReq>(cfg: Arc<Config>, req: Req) -> TGFuture<Option<<Req::Resp as TGResp>::Type>> {
-  let fut = req.request(cfg)
+fn send<Req: TGReq>(cfg: &Arc<Config>, req: Req) -> TGFuture<Option<<Req::Resp as TGResp>::Type>> {
+  let fut = req.request(cfg) // todo: reference cfg
     .map(move |resp| {
       let dez: Result<<Req::Resp as TGResp>::Type, TGBotError> = Req::Resp::deserialize(resp);
       match dez {

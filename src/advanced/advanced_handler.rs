@@ -6,15 +6,21 @@ use crate::listener::Lout;
 use crate::tglog;
 use crate::types::{Update, UpdateKind, RawMessage};
 use crate::vision::{VMessagChat, VCallbackQuery, PossibilityMessage};
+use crate::api::BotApi;
 
-pub struct TGAdvancedHandler {
-  cfg: Arc<Config>,
-  lout: Arc<Lout>,
+pub struct TGAdvancedHandler<'a> {
+  cfg: &'a Arc<Config>,
+  lout: &'a Arc<Lout>,
+  api: &'a Arc<BotApi>,
 }
 
-impl TGAdvancedHandler {
-  pub fn new(cfg: Arc<Config>, lout: Arc<Lout>) -> Self {
-    TGAdvancedHandler { cfg, lout }
+impl<'a> TGAdvancedHandler<'a> {
+  pub fn new(cfg: &'a Arc<Config>, lout: &'a Arc<Lout>, api: &'a Arc<BotApi>) -> Self {
+    TGAdvancedHandler {
+      cfg,
+      lout,
+      api,
+    }
   }
 
   pub fn handle(&self, update: Update) {
@@ -29,14 +35,14 @@ impl TGAdvancedHandler {
     match &update.kind {
       UpdateKind::Message(ref raw) => {
         info!(tglog::advanced(), "{} | INCOMMING MESSAGE: {:?}", if update.is_edited { "EDITED" } else { "POST" }, raw);
-        message_handler::handle( &self.lout, raw, update.is_edited);
+        message_handler::handle(&self.lout, raw, update.is_edited);
         return;
-      },
+      }
       UpdateKind::Channel(ref raw) => {
         info!(tglog::advanced(), "{} | INCOMMING CHANNEL MESSAGE: {:?}", if update.is_edited { "EDITED" } else { "POST" }, raw);
         message_handler::handle(&self.lout, raw, update.is_edited);
         return;
-      },
+      }
       UpdateKind::CallbackQuery(ref callback_query) => {
         info!(tglog::advanced(), "INCOMMING CALLBACK_QUERY: {:?}", callback_query);
         if let Some(fnc) = self.lout.listen_callback_query() {
@@ -45,12 +51,12 @@ impl TGAdvancedHandler {
             from: callback_query.from.clone(),
             message: PossibilityMessage::new(callback_query.message.clone()),
             chat_instance: callback_query.chat_instance.clone(),
-            data: callback_query.data.clone()
+            data: callback_query.data.clone(),
           };
           (*fnc)(&vcq);
           return;
         }
-      },
+      }
       UpdateKind::Err(ref err) => {
         error!(tglog::advanced(), "Happen error for update: {:?}, you can post an issue to: https://github.com/fewensa/telegrambot/issues   (include error log)", err);
         error!(tglog::advanced(), "=====================================================");
@@ -64,7 +70,7 @@ impl TGAdvancedHandler {
           (&fnc)(err);
           return;
         }
-      },
+      }
       UpdateKind::Unknown => {
         let notice = "Not support update type. please post an issue to: https://github.com/fewensa/telegrambot/issues   (include error log)".to_string();
         error!(tglog::advanced(), "{:?}", notice);
@@ -81,7 +87,6 @@ impl TGAdvancedHandler {
         }
       }
     };
-
   }
 }
 

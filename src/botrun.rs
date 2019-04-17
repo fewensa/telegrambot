@@ -10,6 +10,7 @@ use crate::errors::{TGBotErrorKind, TGBotResult};
 use crate::listener::Lout;
 use crate::stream::UpdatesStream;
 use crate::tglog;
+use crate::api::BotApi;
 
 pub fn run(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
   match cfg.mode() {
@@ -21,8 +22,10 @@ pub fn run(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
 
 fn polling(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
   let stream = UpdatesStream::new(cfg.clone());
+  let api = Arc::new(BotApi::new(cfg.clone()));
+
   let future = stream.for_each(move |update| {
-    TGAdvancedHandler::new(cfg.clone(), lout.clone())
+    TGAdvancedHandler::new(&cfg, &lout, &api)
       .handle(update);
     Ok(())
   }).map_err(|e| {

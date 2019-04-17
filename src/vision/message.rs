@@ -1,4 +1,4 @@
-use crate::types::{Audio, Chat, Contact, Document, Forward, Location, PhotoSize, RawMessage, Sticker, User, Venue, Video, VideoNote, Voice, MessageEntity};
+use crate::types::{Audio, Chat, Contact, Document, Forward, Location, PhotoSize, RawMessage, Sticker, User, Venue, Video, VideoNote, Voice, MessageEntity, MessageChat, Channel};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Message {
@@ -8,8 +8,8 @@ pub struct Message {
   pub from: Option<User>,
   /// Date the message was sent in Unix time.
   pub date: i64,
-  /// Conversation the message belongs to.
-  pub chat: Chat,
+//  /// Conversation the message belongs to.
+//  pub chat: Chat,
   /// Information about the original message.
   pub forward: Option<Forward>,
   /// For replies, the original message. Note that the Message object in this field will not
@@ -17,6 +17,14 @@ pub struct Message {
   pub reply_to_message: Option<Box<RawMessage>>,
   /// Date the message was last edited in Unix time.
   pub edit_date: Option<i64>,
+  /// Message kind, Message | Channel
+  pub archive: MessageArchive
+}
+
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
+pub enum MessageArchive {
+  Message(MessageChat),
+  Channel(Channel)
 }
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]

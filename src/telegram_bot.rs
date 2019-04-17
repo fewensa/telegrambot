@@ -8,6 +8,7 @@ use crate::errors::{TGBotErrorKind, TGBotResult};
 use crate::listener::{Listener, Lout};
 use crate::types::Update;
 use crate::vision::*;
+use crate::api::BotApi;
 
 pub struct TelegramBot {
   cfg: Arc<Config>,
@@ -19,8 +20,9 @@ impl TelegramBot {
     if cfg.token().is_empty() {
       return Err(TGBotErrorKind::LoseToken.into_with(|| "Telegram bot token is empty."));
     }
+    let cfg = Arc::new(cfg);
     Ok(TelegramBot {
-      cfg: Arc::new(cfg),
+      cfg,
       listener: Listener::default(),
     })
   }

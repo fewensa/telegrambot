@@ -18,7 +18,7 @@ impl PossibilityMessage {
     advanced::to_message(&self.raw)
   }
 
-  pub fn on_text<F>(&self, fnc: F) -> &Self where F: Fn(&VTextMessage) {
+  pub fn with_text<F>(&self, fnc: F) -> &Self where F: Fn(&VTextMessage) {
     if let Some(text) = &self.raw.text {
       let message = self.to_message();
       let entities = self.raw.entities.clone().unwrap_or_else(|| Vec::with_capacity(0));
@@ -28,7 +28,7 @@ impl PossibilityMessage {
     self
   }
 
-  pub fn on_audio<F>(&self, fnc: F) -> &Self where F: Fn(&VAudioMessage) {
+  pub fn with_audio<F>(&self, fnc: F) -> &Self where F: Fn(&VAudioMessage) {
     if let Some(audio) = &self.raw.audio {
       let message = self.to_message();
       let obj = VAudioMessage { message, audio: audio.clone() };
@@ -37,7 +37,7 @@ impl PossibilityMessage {
     self
   }
 
-  pub fn on_document<F>(&self, fnc: F) -> &Self where F: Fn(&VDocumentMessage) {
+  pub fn with_document<F>(&self, fnc: F) -> &Self where F: Fn(&VDocumentMessage) {
     if let Some(document) = &self.raw.document {
       let message = self.to_message();
       let obj = VDocumentMessage {
@@ -50,7 +50,7 @@ impl PossibilityMessage {
     self
   }
 
-  pub fn on_photo<F>(&self, fnc: F) -> &Self where F: Fn(&VPhotoMessage) {
+  pub fn with_photo<F>(&self, fnc: F) -> &Self where F: Fn(&VPhotoMessage) {
     if let Some(photo) = &self.raw.photo {
       let message = self.to_message();
       let obj = VPhotoMessage {
@@ -64,7 +64,7 @@ impl PossibilityMessage {
     self
   }
 
-  pub fn on_sticker<F>(&self, fnc: F) -> &Self where F: Fn(&VStickerMessage) {
+  pub fn with_sticker<F>(&self, fnc: F) -> &Self where F: Fn(&VStickerMessage) {
     if let Some(sticker) = &self.raw.sticker {
       let message = self.to_message();
       let obj = VStickerMessage { message, sticker: sticker.clone() };
@@ -73,7 +73,7 @@ impl PossibilityMessage {
     self
   }
 
-  pub fn on_video<F>(&self, fnc: F) -> &Self where F: Fn(&VVideoMessage) {
+  pub fn with_video<F>(&self, fnc: F) -> &Self where F: Fn(&VVideoMessage) {
     if let Some(video) = &self.raw.video {
       let message = self.to_message();
       let obj = VVideoMessage {
@@ -87,7 +87,7 @@ impl PossibilityMessage {
     self
   }
 
-  pub fn on_voice<F>(&self, fnc: F) -> &Self where F: Fn(&VVoiceMessage) {
+  pub fn with_voice<F>(&self, fnc: F) -> &Self where F: Fn(&VVoiceMessage) {
     if let Some(voice) = &self.raw.voice {
       let message = self.to_message();
       let obj = VVoiceMessage { message, voice: voice.clone() };
@@ -96,7 +96,7 @@ impl PossibilityMessage {
     self
   }
 
-  pub fn on_video_note<F>(&self, fnc: F) -> &Self where F: Fn(&VVideoNoteMessage) {
+  pub fn with_video_note<F>(&self, fnc: F) -> &Self where F: Fn(&VVideoNoteMessage) {
     if let Some(video_note) = &self.raw.video_note {
       let message = self.to_message();
       let obj = VVideoNoteMessage { message, video_note: video_note.clone() };
@@ -106,7 +106,7 @@ impl PossibilityMessage {
   }
 
 
-  pub fn on_location<F>(&self, fnc: F) -> &Self where F: Fn(&VLocationMessage) {
+  pub fn with_location<F>(&self, fnc: F) -> &Self where F: Fn(&VLocationMessage) {
     if let Some(location) = &self.raw.location {
       let message = self.to_message();
       let obj = VLocationMessage { message, location: location.clone() };
@@ -115,7 +115,7 @@ impl PossibilityMessage {
     self
   }
 
-  pub fn on_venue<F>(&self, fnc: F) -> &Self where F: Fn(&VVenueMessage) {
+  pub fn with_venue<F>(&self, fnc: F) -> &Self where F: Fn(&VVenueMessage) {
     if let Some(venue) = &self.raw.venue {
       let message = self.to_message();
       let obj = VVenueMessage { message, venue: venue.clone() };

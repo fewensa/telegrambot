@@ -7,7 +7,7 @@ use futures::{Async, Stream};
 use futures::future::Future;
 use tokio::timer::Interval;
 
-use crate::botapi::{GetUpdates, TGReq, TGResp};
+use crate::api::{GetUpdates, TGReq, TGResp};
 use crate::config::Config;
 use crate::errors::TGBotError;
 use crate::errors::TGBotErrorKind;

@@ -1,7 +1,7 @@
 use error_chain_mini::ChainedError;
 use error_chain_mini::ErrorKind;
 
-use crate::botapi::RespParas;
+use crate::api::RespParas;
 
 #[derive(ErrorKind)]
 pub enum TGBotErrorKind {

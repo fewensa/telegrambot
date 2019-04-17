@@ -6,8 +6,8 @@ use futures::stream::Stream;
 use reqwest::Url;
 use serde::Serialize;
 
-use crate::botapi::resp::HttpResp;
-use crate::botapi::TGReq;
+use crate::api::resp::HttpResp;
+use crate::api::TGReq;
 use crate::config::Config;
 use crate::errors::TGBotErrorKind;
 use crate::tgfut::TGFuture;

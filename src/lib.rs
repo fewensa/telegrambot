@@ -20,7 +20,6 @@ mod telegram_bot;
 mod stream;
 mod botrun;
 mod tgfut;
-mod botapi;
 mod tglog;
 mod advanced;
 mod listener;

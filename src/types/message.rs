@@ -1,6 +1,6 @@
 use serde::de::{Deserialize, Deserializer, Error};
 
-use crate::botapi::TELEGRAM_API_URL;
+use crate::api::TELEGRAM_API_URL;
 use crate::types::*;
 
 ///// This object represents a chat message or a channel post.

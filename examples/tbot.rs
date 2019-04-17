@@ -13,17 +13,13 @@ fn main() {
     .unwrap();
 
 
-  TelegramBot::new(cfg)
-    .unwrap()
-//    .on_update(|update| {
-//      println!("{:?}", update);
-//    })
+  TelegramBot::new(cfg).unwrap()
     .on_text(|vtex| {
       if let Some(reply) = &vtex.message.reply_to_message {
-        reply.on_text(|vtex| {
+        reply.with_text(|vtex| {
           println!("<<<<<=====>>>> replay text message {:?}", vtex);
         })
-          .on_sticker(|vtex| {
+          .with_sticker(|vtex| {
             println!("<<<<<=====>>>> replay sticker message {:?}", vtex);
           });
       }
@@ -41,10 +37,11 @@ fn main() {
     .on_callback_query(|cq| {
       println!("=====> DOCUMENT: {:?}", cq);
     })
-    .on_command("/start",|cmd| {
+    .on_command("/start", |cmd| {
       println!("=====> COMMAND /start  {:?}", cmd);
     })
-    .on_command("/list",|cmd| {
+    .on_command("/list", move |cmd| {
+//      api.get_me();
       println!("=====> COMMAND /list  {:?}", cmd);
     })
     .start()

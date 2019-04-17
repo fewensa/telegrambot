@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use crate::botapi::{tgkit, TGReq};
-use crate::botapi::resp::{HttpResp, RespType};
+use crate::api::{tgkit, TGReq};
+use crate::api::resp::{HttpResp, RespType};
 use crate::config::Config;
 use crate::tgfut::TGFuture;
 use crate::types::Update;

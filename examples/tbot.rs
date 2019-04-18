@@ -39,35 +39,45 @@ fn main() {
       println!("THUMBS: {:?}", thumbs);
 //      let futapi = botapi.futapi();
 
-      let (tx, rx) = futures::sync::oneshot::channel();
-
-      api.futapi()
-        .get_file(&GetFile::new(thumbs.clone().unwrap()))
-        .select(api.futapi()
-          .get_file(&GetFile::new(thumbs.clone().unwrap())))
-        .map(|a|{})
-        .map_err(|e|{});
-
-      tokio::spawn(api.futapi()
-        .get_file(&GetFile::new(thumbs.clone().unwrap()))
-        .map(|file| {
-          println!("+=========> {:?}", file);
-          tx.send(file);
-        })
-        .map_err(|e| eprintln!("{:?}", e))
-      );
-
-
-      let a = rx.map(|file|{
-        println!("got: {:?}", file);
-        let fut = api.futapi().send_message(
+      let fut = botapi.futapi()
+        .get_file(&GetFile::new(thumbs.clone().unwrap()));
+      let fut = fut.and_then(|file| botapi.futapi().send_message(
             SendMessage::new(sti.message.chat.clone(), file.unwrap().file_id)
               .parse_mode(ParseMode::Markdown)
-          )
-          .map(|a| {})
-          .map_err(|e| eprintln!("{:?}", e));
-        tokio::spawn(fut);
-      }).wait();
+          ));
+      let fut = fut.map(|a| println!("{:?}", a))
+        .map_err(|e| eprintln!("{:?}", e));
+      tokio::spawn(fut);
+
+//      let (tx, rx) = futures::sync::oneshot::channel();
+//
+//      api.futapi()
+//        .get_file(&GetFile::new(thumbs.clone().unwrap()))
+//        .select(api.futapi()
+//          .get_file(&GetFile::new(thumbs.clone().unwrap())))
+//        .map(|a|{})
+//        .map_err(|e|{});
+//
+//      tokio::spawn(api.futapi()
+//        .get_file(&GetFile::new(thumbs.clone().unwrap()))
+//        .map(|file| {
+//          println!("+=========> {:?}", file);
+//          tx.send(file);
+//        })
+//        .map_err(|e| eprintln!("{:?}", e))
+//      );
+//
+//
+//      let a = rx.map(|file|{
+//        println!("got: {:?}", file);
+//        let fut = api.futapi().send_message(
+//            SendMessage::new(sti.message.chat.clone(), file.unwrap().file_id)
+//              .parse_mode(ParseMode::Markdown)
+//          )
+//          .map(|a| {})
+//          .map_err(|e| eprintln!("{:?}", e));
+//        tokio::spawn(fut);
+//      }).wait();
 
 
     })

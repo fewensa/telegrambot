@@ -161,6 +161,8 @@ impl BotApi {
   }
 
   pub fn send_message(&self, req: &SendMessage) -> TGBotResult<Option<PossibilityMessage>> {
+//    let mut runtime = tokio::runtime::current_thread::Runtime::new().expect("Unable to create a runtime");
+//    runtime.block_on(self.futapi().send_message(req))
     self.futapi().send_message(req).wait()
   }
 

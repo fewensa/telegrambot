@@ -3,7 +3,7 @@ use std::env;
 use telegrambot::api::{GetFile, SendMessage};
 use telegrambot::config::Config;
 use telegrambot::TelegramBot;
-use telegrambot::types::ToChatRef;
+use telegrambot::types::{ToChatRef, ParseMode};
 use futures::future::{Future, IntoFuture};
 
 fn main() {
@@ -38,7 +38,6 @@ fn main() {
       if let Ok(f) = result {
         api.send_message(&SendMessage::new(chat, f.unwrap().file_id));
       }
-
     })
     .on_photo(|(api, pho)| {
       println!("=====> PHOTO: {:?}", pho);
@@ -52,9 +51,16 @@ fn main() {
     .on_command("/start", |(api, cmd)| {
       println!("=====> COMMAND /start  {:?}", cmd);
     })
-    .on_command("/list", move |(api, cmd)| {
+    .on_command("/list", |(api, cmd)| {
+      if cmd.message.is_edited {
+        return;
+      }
       let result1 = api.get_me();
-      api.send_message(&SendMessage::new(cmd.message.chat.to_chat_ref(), "Hello"));
+      api.futapi().spawn(
+        api.futapi().send_message(SendMessage::new(cmd.message.chat.clone(), "*Hello*").parse_mode(ParseMode::Markdown))
+          .map(|a| {})
+          .map_err(|e| {})
+      );
       println!("=====> COMMAND /list  {:?}", cmd);
     })
     .start()

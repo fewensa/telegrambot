@@ -114,6 +114,9 @@ fn extra_command(text: &String) -> (String, Vec<String>) {
           continue;
         }
         if !entry_command {
+          if builder.is_empty() {
+            continue;
+          }
           args.push(builder.string());
           builder.clear();
           continue;

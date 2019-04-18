@@ -32,12 +32,12 @@ fn main() {
       println!("=====> STICKER: {:?} ===> FILEID: {:?}", sti, sti.sticker.file_id);
       let thumbs = &sti.sticker.thumb;
       println!("THUMBS: {:?}", thumbs);
-      let chat = sti.message.chat.to_chat_ref();
-      let result = api.get_file(&GetFile::new(thumbs.clone().unwrap()));
-
-      if let Ok(f) = result {
-        api.send_message(&SendMessage::new(chat, f.unwrap().file_id));
-      }
+//      let chat = sti.message.chat.to_chat_ref();
+//      let result = api.get_file(&GetFile::new(thumbs.clone().unwrap()));
+//
+//      if let Ok(f) = result {
+//        api.send_message(&SendMessage::new(chat, f.unwrap().file_id));
+//      }
     })
     .on_photo(|(api, pho)| {
       println!("=====> PHOTO: {:?}", pho);
@@ -55,10 +55,13 @@ fn main() {
       if cmd.message.is_edited {
         return;
       }
-      let result1 = api.get_me();
+//      let result1 = api.get_me();
       api.futapi().spawn(
-        api.futapi().send_message(SendMessage::new(cmd.message.chat.clone(), "*Hello*").parse_mode(ParseMode::Markdown))
-          .map(|a| {})
+        api.futapi()
+          .send_message(SendMessage::new(cmd.message.chat.clone(), "*Hello*")
+            .parse_mode(ParseMode::Markdown))
+          .join(api.futapi().get_me())
+          .map(|(a, b)| {})
           .map_err(|e| {})
       );
       println!("=====> COMMAND /list  {:?}", cmd);

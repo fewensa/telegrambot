@@ -37,8 +37,8 @@ use crate::tglog;
 use crate::types::*;
 use crate::vision::PossibilityMessage;
 
-//pub const TELEGRAM_API_URL: &'static str = "https://tgb.akafwtll.tk/";
-pub const TELEGRAM_API_URL: &'static str = "https://api.telegram.org/";
+pub const TELEGRAM_API_URL: &'static str = "https://tgb.akafwtll.tk/";
+//pub const TELEGRAM_API_URL: &'static str = "https://api.telegram.org/";
 
 pub struct BotApi {
   futapi: BotFutApi,
@@ -75,113 +75,109 @@ impl BotApi {
 //  }
 
 
-//  pub fn get_me<F>(&self, fnc: F)
-//    where F: Fn((Option<User>, Option<TGBotError>)) + Send + Sync + Clone + 'static {
-//    self.fnc_call_option(fnc, self.futapi().get_me())
+
+//  pub fn get_me(&self) -> TGBotResult<Option<User>> {
+//    self.futapi().get_me().wait()
 //  }
-
-  pub fn get_me(&self) -> TGBotResult<Option<User>> {
-    self.futapi().get_me().wait()
-  }
-
-  pub fn answer_callback_query(&self, req: &AnswerCallbackQuery) -> TGBotResult<()> {
-    self.futapi().answer_callback_query(req).wait().map(|ret| ())
-  }
-
-
-  pub fn delete_message(&self, req: &DeleteMessage) -> TGBotResult<()> {
-    self.futapi().delete_message(req).wait().map(|ret| ())
-  }
-
-  pub fn edit_message_caption(&self, req: &EditMessageCaption) -> TGBotResult<Option<PossibilityMessage>> {
-    self.futapi().edit_message_caption(req).wait()
-  }
-
-  pub fn edit_message_reply_markup(&self, req: &EditMessageReplyMarkup) -> TGBotResult<Option<PossibilityMessage>> {
-    self.futapi().edit_message_reply_markup(req).wait()
-  }
-
-  pub fn edit_message_text(&self, req: &EditMessageText) -> TGBotResult<Option<PossibilityMessage>> {
-    self.futapi().edit_message_text(req).wait()
-  }
-
-  pub fn forward_message(&self, req: &ForwardMessage) -> TGBotResult<Option<PossibilityMessage>> {
-    self.futapi().forward_message(req).wait()
-  }
-
-  pub fn get_chat(&self, req: &GetChat) -> TGBotResult<Option<Chat>> {
-    self.futapi().get_chat(req).wait()
-  }
-
-  pub fn get_chat_administrators(&self, req: &GetChatAdministrators) -> TGBotResult<Option<Vec<ChatMember>>> {
-    self.futapi().get_chat_administrators(req).wait()
-  }
-
-  pub fn get_chat_member(&self, req: &GetChatMember) -> TGBotResult<Option<ChatMember>> {
-    self.futapi().get_chat_member(req).wait()
-  }
-
-  pub fn get_chat_members_count(&self, req: &GetChatMembersCount) -> TGBotResult<Option<i64>> {
-    self.futapi().get_chat_members_count(req).wait()
-  }
-
-  pub fn get_file(&self, req: &GetFile) -> TGBotResult<Option<File>> {
-    self.futapi().get_file(req).wait()
-  }
-
-  pub fn get_user_profile_photos(&self, req: &GetUserProfilePhotos) -> TGBotResult<Option<UserProfilePhotos>> {
-    self.futapi().get_user_profile_photos(req).wait()
-  }
-
-  pub fn kick_chat_member(&self, req: &KickChatMember) -> TGBotResult<()> {
-    self.futapi().kick_chat_member(req).wait().map(|ret| ())
-  }
-
-  pub fn leave_chat(&self, req: &LeaveChat) -> TGBotResult<()> {
-    self.futapi().leave_chat(req).wait().map(|ret| ())
-  }
-
-  pub fn pin_chat_message(&self, req: &PinChatMessage) -> TGBotResult<()> {
-    self.futapi().pin_chat_message(req).wait().map(|ret| ())
-  }
-
-  pub fn send_audio(&self, req: &SendAudio) -> TGBotResult<()> {
-    self.futapi().send_audio(req).wait().map(|ret| ())
-  }
-
-  pub fn send_chat_action(&self, req: &SendChatAction) -> TGBotResult<()> {
-    self.futapi().send_chat_action(req).wait().map(|ret| ())
-  }
-
-  pub fn send_contact(&self, req: &SendContact) -> TGBotResult<Option<PossibilityMessage>> {
-    self.futapi().send_contact(req).wait()
-  }
-
-  pub fn send_location(&self, req: &SendLocation) -> TGBotResult<Option<PossibilityMessage>> {
-    self.futapi().send_location(req).wait()
-  }
-
-  pub fn send_message(&self, req: &SendMessage) -> TGBotResult<Option<PossibilityMessage>> {
-//    let mut runtime = tokio::runtime::current_thread::Runtime::new().expect("Unable to create a runtime");
-//    runtime.block_on(self.futapi().send_message(req))
-    self.futapi().send_message(req).wait()
-  }
-
-  pub fn send_venue(&self, req: &SendVenue) -> TGBotResult<Option<PossibilityMessage>> {
-    self.futapi().send_venue(req).wait()
-  }
-
-  pub fn stop_message_live_location(&self, req: &StopMessageLiveLocation) -> TGBotResult<Option<PossibilityMessage>> {
-    self.futapi().stop_message_live_location(req).wait()
-  }
-
-  pub fn unban_chat_member(&self, req: &UnbanChatMember) -> TGBotResult<()> {
-    self.futapi().unban_chat_member(req).wait().map(|ret| ())
-  }
-
-  pub fn unpin_chat_message(&self, req: &UnpinChatMessage) -> TGBotResult<()> {
-    self.futapi().unpin_chat_message(req).wait().map(|ret| ())
-  }
+//
+//  pub fn answer_callback_query(&self, req: &AnswerCallbackQuery) -> TGBotResult<()> {
+//    self.futapi().answer_callback_query(req).wait().map(|ret| ())
+//  }
+//
+//
+//  pub fn delete_message(&self, req: &DeleteMessage) -> TGBotResult<()> {
+//    self.futapi().delete_message(req).wait().map(|ret| ())
+//  }
+//
+//  pub fn edit_message_caption(&self, req: &EditMessageCaption) -> TGBotResult<Option<PossibilityMessage>> {
+//    self.futapi().edit_message_caption(req).wait()
+//  }
+//
+//  pub fn edit_message_reply_markup(&self, req: &EditMessageReplyMarkup) -> TGBotResult<Option<PossibilityMessage>> {
+//    self.futapi().edit_message_reply_markup(req).wait()
+//  }
+//
+//  pub fn edit_message_text(&self, req: &EditMessageText) -> TGBotResult<Option<PossibilityMessage>> {
+//    self.futapi().edit_message_text(req).wait()
+//  }
+//
+//  pub fn forward_message(&self, req: &ForwardMessage) -> TGBotResult<Option<PossibilityMessage>> {
+//    self.futapi().forward_message(req).wait()
+//  }
+//
+//  pub fn get_chat(&self, req: &GetChat) -> TGBotResult<Option<Chat>> {
+//    self.futapi().get_chat(req).wait()
+//  }
+//
+//  pub fn get_chat_administrators(&self, req: &GetChatAdministrators) -> TGBotResult<Option<Vec<ChatMember>>> {
+//    self.futapi().get_chat_administrators(req).wait()
+//  }
+//
+//  pub fn get_chat_member(&self, req: &GetChatMember) -> TGBotResult<Option<ChatMember>> {
+//    self.futapi().get_chat_member(req).wait()
+//  }
+//
+//  pub fn get_chat_members_count(&self, req: &GetChatMembersCount) -> TGBotResult<Option<i64>> {
+//    self.futapi().get_chat_members_count(req).wait()
+//  }
+//
+//  pub fn get_file(&self, req: &GetFile) -> TGBotResult<Option<File>> {
+//    self.futapi().get_file(req).wait()
+//  }
+//
+//  pub fn get_user_profile_photos(&self, req: &GetUserProfilePhotos) -> TGBotResult<Option<UserProfilePhotos>> {
+//    self.futapi().get_user_profile_photos(req).wait()
+//  }
+//
+//  pub fn kick_chat_member(&self, req: &KickChatMember) -> TGBotResult<()> {
+//    self.futapi().kick_chat_member(req).wait().map(|ret| ())
+//  }
+//
+//  pub fn leave_chat(&self, req: &LeaveChat) -> TGBotResult<()> {
+//    self.futapi().leave_chat(req).wait().map(|ret| ())
+//  }
+//
+//  pub fn pin_chat_message(&self, req: &PinChatMessage) -> TGBotResult<()> {
+//    self.futapi().pin_chat_message(req).wait().map(|ret| ())
+//  }
+//
+//  pub fn send_audio(&self, req: &SendAudio) -> TGBotResult<()> {
+//    self.futapi().send_audio(req).wait().map(|ret| ())
+//  }
+//
+//  pub fn send_chat_action(&self, req: &SendChatAction) -> TGBotResult<()> {
+//    self.futapi().send_chat_action(req).wait().map(|ret| ())
+//  }
+//
+//  pub fn send_contact(&self, req: &SendContact) -> TGBotResult<Option<PossibilityMessage>> {
+//    self.futapi().send_contact(req).wait()
+//  }
+//
+//  pub fn send_location(&self, req: &SendLocation) -> TGBotResult<Option<PossibilityMessage>> {
+//    self.futapi().send_location(req).wait()
+//  }
+//
+//  pub fn send_message(&self, req: &SendMessage) -> TGBotResult<Option<PossibilityMessage>> {
+////    let mut runtime = tokio::runtime::current_thread::Runtime::new().expect("Unable to create a runtime");
+////    runtime.block_on(self.futapi().send_message(req))
+//    self.futapi().send_message(req).wait()
+//  }
+//
+//  pub fn send_venue(&self, req: &SendVenue) -> TGBotResult<Option<PossibilityMessage>> {
+//    self.futapi().send_venue(req).wait()
+//  }
+//
+//  pub fn stop_message_live_location(&self, req: &StopMessageLiveLocation) -> TGBotResult<Option<PossibilityMessage>> {
+//    self.futapi().stop_message_live_location(req).wait()
+//  }
+//
+//  pub fn unban_chat_member(&self, req: &UnbanChatMember) -> TGBotResult<()> {
+//    self.futapi().unban_chat_member(req).wait().map(|ret| ())
+//  }
+//
+//  pub fn unpin_chat_message(&self, req: &UnpinChatMessage) -> TGBotResult<()> {
+//    self.futapi().unpin_chat_message(req).wait().map(|ret| ())
+//  }
 
 }
 

@@ -1,20 +1,25 @@
 use std::env;
 
-use telegrambot::api::{GetFile, SendMessage};
+use telegrambot::api::{GetFile, SendMessage, BotApi};
 use telegrambot::config::Config;
 use telegrambot::TelegramBot;
 use telegrambot::types::{ToChatRef, ParseMode};
 use futures::future::{Future, IntoFuture};
+use telegrambot::api::rawreq::RawReq;
+use std::sync::Arc;
 
 fn main() {
   let token = env::var("TELEGRAM_BOT_TOKEN").unwrap();
 //  let cfg = Config::new(token);
 //  let cfg = Config { token, mode: ConnectMode::Polling };
+  let a = token.clone();
   let cfg = Config::builder(token)
 //    .proxy("http://127.0.0.1:1081")
     .build()
     .unwrap();
 
+  let rawreq = RawReq::new(Arc::new(cfg.client().clone()), a);
+  let botapi = Arc::new(BotApi::new(rawreq));
 
   TelegramBot::new(cfg).unwrap()
     .on_text(|(api, vtex)| {
@@ -28,16 +33,43 @@ fn main() {
       }
       println!("=====> TEXT: {:?}", vtex);
     })
-    .on_sticker(|(api, sti)| {
+    .on_sticker(move |(api, sti)| {
       println!("=====> STICKER: {:?} ===> FILEID: {:?}", sti, sti.sticker.file_id);
       let thumbs = &sti.sticker.thumb;
       println!("THUMBS: {:?}", thumbs);
-//      let chat = sti.message.chat.to_chat_ref();
-//      let result = api.get_file(&GetFile::new(thumbs.clone().unwrap()));
-//
-//      if let Ok(f) = result {
-//        api.send_message(&SendMessage::new(chat, f.unwrap().file_id));
-//      }
+//      let futapi = botapi.futapi();
+
+      let (tx, rx) = futures::sync::oneshot::channel();
+
+      api.futapi()
+        .get_file(&GetFile::new(thumbs.clone().unwrap()))
+        .select(api.futapi()
+          .get_file(&GetFile::new(thumbs.clone().unwrap())))
+        .map(|a|{})
+        .map_err(|e|{});
+
+      tokio::spawn(api.futapi()
+        .get_file(&GetFile::new(thumbs.clone().unwrap()))
+        .map(|file| {
+          println!("+=========> {:?}", file);
+          tx.send(file);
+        })
+        .map_err(|e| eprintln!("{:?}", e))
+      );
+
+
+      let a = rx.map(|file|{
+        println!("got: {:?}", file);
+        let fut = api.futapi().send_message(
+            SendMessage::new(sti.message.chat.clone(), file.unwrap().file_id)
+              .parse_mode(ParseMode::Markdown)
+          )
+          .map(|a| {})
+          .map_err(|e| eprintln!("{:?}", e));
+        tokio::spawn(fut);
+      }).wait();
+
+
     })
     .on_photo(|(api, pho)| {
       println!("=====> PHOTO: {:?}", pho);

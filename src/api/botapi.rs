@@ -37,7 +37,8 @@ use crate::tglog;
 use crate::types::*;
 use crate::vision::PossibilityMessage;
 
-pub const TELEGRAM_API_URL: &'static str = "https://tgb.akafwtll.tk/";
+//pub const TELEGRAM_API_URL: &'static str = "https://tgb.akafwtll.tk/";
+pub const TELEGRAM_API_URL: &'static str = "https://api.telegram.org/";
 
 pub struct BotApi {
   futapi: BotFutApi,

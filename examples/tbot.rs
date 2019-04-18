@@ -1,7 +1,10 @@
 use std::env;
 
+use telegrambot::api::{GetFile, SendMessage};
 use telegrambot::config::Config;
 use telegrambot::TelegramBot;
+use telegrambot::types::ToChatRef;
+use futures::future::{Future, IntoFuture};
 
 fn main() {
   let token = env::var("TELEGRAM_BOT_TOKEN").unwrap();
@@ -26,7 +29,16 @@ fn main() {
       println!("=====> TEXT: {:?}", vtex);
     })
     .on_sticker(|(api, sti)| {
-      println!("=====> STICKER: {:?}", sti);
+      println!("=====> STICKER: {:?} ===> FILEID: {:?}", sti, sti.sticker.file_id);
+      let thumbs = &sti.sticker.thumb;
+      println!("THUMBS: {:?}", thumbs);
+      let chat = sti.message.chat.to_chat_ref();
+      let result = api.get_file(&GetFile::new(thumbs.clone().unwrap()));
+
+      if let Ok(f) = result {
+        api.send_message(&SendMessage::new(chat, f.unwrap().file_id));
+      }
+
     })
     .on_photo(|(api, pho)| {
       println!("=====> PHOTO: {:?}", pho);
@@ -41,9 +53,8 @@ fn main() {
       println!("=====> COMMAND /start  {:?}", cmd);
     })
     .on_command("/list", move |(api, cmd)| {
-      api.get_me(|(user, err)| {
-        println!("{:?}", user);
-      });
+      let result1 = api.get_me();
+      api.send_message(&SendMessage::new(cmd.message.chat.to_chat_ref(), "Hello"));
       println!("=====> COMMAND /list  {:?}", cmd);
     })
     .start()

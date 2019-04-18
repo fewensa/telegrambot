@@ -161,33 +161,33 @@ impl Serialize for ChatRef {
 }
 
 macro_rules! chat_id_impls {
-    ($id: ident) => {
-        integer_id_impls!($id);
+  ($id: ident) => {
+    integer_id_impls!($id);
 
-        impl ToChatRef for $id {
-            fn to_chat_ref(&self) -> ChatRef {
-                ChatRef::from_chat_id((*self).into())
-            }
-        }
-    };
+    impl ToChatRef for $id {
+      fn to_chat_ref(&self) -> ChatRef {
+        ChatRef::from_chat_id((*self).into())
+      }
+    }
+  };
 }
 
 macro_rules! specific_chat_id_impls {
-    ($id: ident, $typ: ident) => {
-        chat_id_impls!($id);
+  ($id: ident, $typ: ident) => {
+    chat_id_impls!($id);
 
-        impl From<$id> for ChatId {
-            fn from(c: $id) -> Self {
-                ChatId::new(c.into())
-            }
-        }
+    impl From<$id> for ChatId {
+      fn from(c: $id) -> Self {
+        ChatId::new(c.into())
+      }
+    }
 
-        impl ToChatRef for $typ {
-            fn to_chat_ref(&self) -> ChatRef {
-                self.id.to_chat_ref()
-            }
-        }
-    };
+    impl ToChatRef for $typ {
+      fn to_chat_ref(&self) -> ChatRef {
+        self.id.to_chat_ref()
+      }
+    }
+  };
 }
 
 /// Get `UserId` from the type reference.
@@ -300,13 +300,13 @@ impl<S> ToFileRef for S where S: Deref, S::Target: ToFileRef {
 }
 
 macro_rules! file_id_impls {
-    ($name: ident) => {
-        impl ToFileRef for $name {
-            fn to_file_ref(&self) -> FileRef {
-                self.file_id.clone().into()
-            }
-        }
+  ($name: ident) => {
+    impl ToFileRef for $name {
+      fn to_file_ref(&self) -> FileRef {
+        self.file_id.clone().into()
+      }
     }
+  }
 }
 
 file_id_impls!(PhotoSize);
@@ -340,8 +340,7 @@ impl<'a> From<String> for FileRef {
 }
 
 impl Serialize for FileRef {
-  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where S: Serializer
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer
   {
     serializer.serialize_str(&self.inner)
   }
@@ -372,8 +371,7 @@ pub struct CallbackQueryId {
 
 impl<'de> ::serde::de::Deserialize<'de> for CallbackQueryId {
   fn deserialize<D>(deserializer: D) -> Result<CallbackQueryId, D::Error>
-    where D: ::serde::de::Deserializer<'de>
-  {
+    where D: ::serde::de::Deserializer<'de> {
     let inner = ::serde::de::Deserialize::deserialize(deserializer)?;
     Ok(Self {
       inner
@@ -382,8 +380,7 @@ impl<'de> ::serde::de::Deserialize<'de> for CallbackQueryId {
 }
 
 impl Serialize for CallbackQueryId {
-  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where S: Serializer
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer
   {
     serializer.serialize_str(&self.inner)
   }

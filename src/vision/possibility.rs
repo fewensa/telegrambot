@@ -1,11 +1,23 @@
 use crate::advanced;
 use crate::types::RawMessage;
 use crate::vision::message::*;
+use serde::{Deserialize, Deserializer};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct PossibilityMessage {
   raw: RawMessage
 }
+
+
+impl<'de> Deserialize<'de> for PossibilityMessage {
+  fn deserialize<D>(deserializer: D) -> Result<PossibilityMessage, D::Error>
+    where D: Deserializer<'de>
+  {
+    let raw: RawMessage = Deserialize::deserialize(deserializer)?;
+    Ok(PossibilityMessage::new(raw))
+  }
+}
+
 
 impl PossibilityMessage {
   pub fn new(raw: RawMessage) -> Self {

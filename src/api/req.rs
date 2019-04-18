@@ -4,6 +4,7 @@ use serde::Serialize;
 
 use crate::api::resp::TGResp;
 use crate::errors::{TGBotErrorKind, TGBotResult};
+use crate::types::{ToChatRef, ToMessageId, ToSourceChat};
 
 pub trait TGReq {
   type Resp: TGResp + 'static;
@@ -58,4 +59,24 @@ impl HttpReq {
       body: Some(json),
     })
   }
+}
+
+
+/// Use this trait to convert a complex type to corresponding request and send it to the chat.
+pub trait ToRequest<'b> {
+  /// Request type.
+  type Request: TGReq;
+
+  /// Convert type to request and send it to the chat.
+  fn to_request<C>(&'b self, chat: C) -> Self::Request where C: ToChatRef;
+}
+
+/// Use this trait to convert a complex type to corresponding request and reply to the message.
+pub trait ToReplyRequest<'b> {
+  /// Request type.
+  type Request: TGReq;
+
+  /// Convert type to request and reply to the message.
+  fn to_reply_request<M>(&'b self, message: M) -> Self::Request
+    where M: ToMessageId + ToSourceChat;
 }

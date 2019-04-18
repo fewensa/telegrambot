@@ -30,6 +30,15 @@ pub enum VMessagChat {
   Channel(Channel),
 }
 
+impl ToChatRef for VMessagChat {
+  fn to_chat_ref(&self) -> ChatRef {
+    match *self {
+      VMessagChat::Message(ref chat) => chat.to_chat_ref(),
+      VMessagChat::Channel(ref chat) => ChatRef::ChannelUsername(chat.title.clone())
+    }
+  }
+}
+
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct VTextMessage {
   pub message: Message,

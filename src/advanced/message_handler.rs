@@ -5,8 +5,9 @@ use crate::tglog;
 use crate::types::*;
 use crate::vision::*;
 use crate::advanced::text_handler;
+use crate::api::BotApi;
 
-pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
+pub fn handle(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
   let message = to_message(raw);
 
 
@@ -18,7 +19,7 @@ pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
           $field: val.clone(),
         };
         if let Some(fnc) = lout.$fnc() {
-          (*fnc)(&obj);
+          (*fnc)((api, &obj));
         }
         return;
       }
@@ -34,7 +35,7 @@ pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
             $field: val.clone(),
             caption: raw.caption.clone(),
           };
-          (*fnc)(&obj);
+          (*fnc)((api, &obj));
           return;
         }
       }
@@ -51,7 +52,7 @@ pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
             caption: raw.caption.clone(),
             media_group_id: raw.media_group_id.clone()
           };
-          (*fnc)(&obj);
+          (*fnc)((api, &obj));
           return;
         }
       }
@@ -62,7 +63,7 @@ pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
     ($name:ident, $fnc:ident) => {{
       if let Some(fnc) = lout.$fnc() {
         if let Some(True) = &raw.$name {
-          (*fnc)(&message);
+          (*fnc)((api, &message));
           return;
         }
       }
@@ -70,7 +71,7 @@ pub fn handle(lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
   }
 
   if let Some(_) = &raw.text {
-    text_handler::handle_text(lout, raw, message);
+    text_handler::handle_text(api, lout, raw, message);
     return;
   }
 

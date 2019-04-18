@@ -15,21 +15,22 @@ use crate::tglog;
 use crate::types::Update;
 use crate::api::{rawreq, BotApi, TGReq, TGResp, GetUpdates};
 use crate::api::rawreq::RawReq;
+use std::rc::Rc;
 
 const TELEGRAM_LONG_POLL_TIMEOUT_SECONDS: i64 = 5;
 const TELEGRAM_LONG_POLL_ERROR_DELAY_MILLISECONDS: u64 = 500;
 
-pub struct UpdatesStream<'a> {
+pub struct UpdatesStream {
   //    interval: Interval,
-  api: &'a BotApi,
+  api: Arc<BotApi>,
   error_interval: Interval,
   last_update: i64,
   buffer: VecDeque<Update>,
   updates: Option<TGFuture<Option<Vec<Update>>>>,
 }
 
-impl<'a> UpdatesStream<'a> {
-  pub fn new(api: &'a BotApi) -> Self {
+impl UpdatesStream {
+  pub fn new(api: Arc<BotApi>) -> Self {
     UpdatesStream {
       api,
 //      interval: Interval::new_interval(Duration::from_secs(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS)),
@@ -41,7 +42,7 @@ impl<'a> UpdatesStream<'a> {
   }
 }
 
-impl<'a> Stream for UpdatesStream<'a> {
+impl Stream for UpdatesStream {
   type Item = Update;
   type Error = TGBotError; // todo: do not return error, if happen error, wait and retry
 
@@ -55,11 +56,9 @@ impl<'a> Stream for UpdatesStream<'a> {
 //    let cfg = self.cfg.clone();
     let last_update = self.last_update;
 
+    let api = self.api.clone();
     let upfut = self.updates.get_or_insert_with(|| {
-//      self::send(self.api, GetUpdates::new()
-//        .offset(last_update + 1)
-//        .timeout(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS))
-      self.api.get_update(GetUpdates::new()
+      api.futapi().get_update(GetUpdates::new()
         .offset(last_update + 1)
         .timeout(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS))
     });
@@ -92,21 +91,4 @@ impl<'a> Stream for UpdatesStream<'a> {
     self.poll()
   }
 }
-
-//fn send<Req: TGReq>(api: &Arc<BotApi>, token: &String, req: Req) -> TGFuture<Option<<Req::Resp as TGResp>::Type>> {
-////  let fut = req.request(cfg) // todo: reference cfg
-////    .map(move |resp| {
-////      let dez: Result<<Req::Resp as TGResp>::Type, TGBotError> = Req::Resp::deserialize(resp);
-////      match dez {
-////        Ok(ret) => Some(ret),
-////        Err(err) => {
-////          // todo: if error do more thing
-////          error!(tglog::telegram(), "Call telegram api fail: {:?}", err);
-////          None
-////        }
-////      }
-////    }).map_err(|e| e);
-////  TGFuture::new(Box::new(fut))
-//
-//}
 

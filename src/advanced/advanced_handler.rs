@@ -1,46 +1,44 @@
+use core::borrow::Borrow;
 use std::sync::Arc;
 
 use crate::advanced::message_handler;
+use crate::api::BotApi;
 use crate::config::Config;
 use crate::listener::Lout;
 use crate::tglog;
-use crate::types::{Update, UpdateKind, RawMessage};
-use crate::vision::{VMessagChat, VCallbackQuery, PossibilityMessage};
-use crate::api::BotApi;
+use crate::types::{RawMessage, Update, UpdateKind};
+use crate::vision::{PossibilityMessage, VCallbackQuery, VMessagChat};
 
 pub struct TGAdvancedHandler<'a> {
-  cfg: &'a Arc<Config>,
   lout: &'a Arc<Lout>,
-  api: &'a Arc<BotApi>,
+  api: &'a BotApi,
 }
 
 impl<'a> TGAdvancedHandler<'a> {
-  pub fn new(cfg: &'a Arc<Config>, lout: &'a Arc<Lout>, api: &'a Arc<BotApi>) -> Self {
+  pub fn new(lout: &'a Arc<Lout>, api: &'a Arc<BotApi>) -> Self {
     TGAdvancedHandler {
-      cfg,
       lout,
-      api,
+      api: api.borrow(),
     }
   }
 
   pub fn handle(&self, update: Update) {
     debug!(tglog::advanced(), "RAW MESSAGE: {:#?}", update);
 
-
     if let Some(update_listener) = self.lout.listen_update() {
-      (*update_listener)(&update);
+      (*update_listener)((self.api, &update));
       return;
     }
 
     match &update.kind {
       UpdateKind::Message(ref raw) => {
         info!(tglog::advanced(), "{} | INCOMMING MESSAGE: {:?}", if update.is_edited { "EDITED" } else { "POST" }, raw);
-        message_handler::handle(&self.lout, raw, update.is_edited);
+        message_handler::handle(self.api, &self.lout, raw, update.is_edited);
         return;
       }
       UpdateKind::Channel(ref raw) => {
         info!(tglog::advanced(), "{} | INCOMMING CHANNEL MESSAGE: {:?}", if update.is_edited { "EDITED" } else { "POST" }, raw);
-        message_handler::handle(&self.lout, raw, update.is_edited);
+        message_handler::handle(self.api, &self.lout, raw, update.is_edited);
         return;
       }
       UpdateKind::CallbackQuery(ref callback_query) => {
@@ -53,7 +51,7 @@ impl<'a> TGAdvancedHandler<'a> {
             chat_instance: callback_query.chat_instance.clone(),
             data: callback_query.data.clone(),
           };
-          (*fnc)(&vcq);
+          (*fnc)((self.api, &vcq));
           return;
         }
       }
@@ -67,7 +65,7 @@ impl<'a> TGAdvancedHandler<'a> {
         error!(tglog::advanced(), "ERROR LOG END");
         error!(tglog::advanced(), "=====================================================");
         if let Some(fnc) = self.lout.listen_error() {
-          (&fnc)(err);
+          (&fnc)((self.api, err));
           return;
         }
       }
@@ -82,7 +80,7 @@ impl<'a> TGAdvancedHandler<'a> {
         error!(tglog::advanced(), "ERROR LOG END");
         error!(tglog::advanced(), "=====================================================");
         if let Some(fnc) = self.lout.listen_error() {
-          (&fnc)(&notice);
+          (&fnc)((self.api, &notice));
           return;
         }
       }

@@ -1,6 +1,6 @@
 use std::env;
 
-use telegrambot::{api, TelegramBot};
+use telegrambot::TelegramBot;
 use telegrambot::config::Config;
 
 fn main() {
@@ -14,7 +14,7 @@ fn main() {
 
 
   TelegramBot::new(cfg).unwrap()
-    .on_text(|vtex| {
+    .on_text(|(api, vtex)| {
       if let Some(reply) = &vtex.message.reply_to_message {
         reply.with_text(|vtex| {
           println!("<<<<<=====>>>> replay text message {:?}", vtex);
@@ -25,23 +25,25 @@ fn main() {
       }
       println!("=====> TEXT: {:?}", vtex);
     })
-    .on_sticker(|sti| {
+    .on_sticker(|(api, sti)| {
       println!("=====> STICKER: {:?}", sti);
     })
-    .on_photo(|pho| {
+    .on_photo(|(api, pho)| {
       println!("=====> PHOTO: {:?}", pho);
     })
-    .on_document(|doc| {
+    .on_document(|(api, doc)| {
       println!("=====> DOCUMENT: {:?}", doc);
     })
-    .on_callback_query(|cq| {
+    .on_callback_query(|(api, cq)| {
       println!("=====> DOCUMENT: {:?}", cq);
     })
-    .on_command("/start", |cmd| {
+    .on_command("/start", |(api, cmd)| {
       println!("=====> COMMAND /start  {:?}", cmd);
     })
-    .on_command("/list", move |cmd| {
-//      api.get_me();
+    .on_command("/list", move |(api, cmd)| {
+      api.get_me(|(user, err)| {
+        println!("{:?}", user);
+      });
       println!("=====> COMMAND /list  {:?}", cmd);
     })
     .start()

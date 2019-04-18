@@ -14,7 +14,7 @@ use crate::api::BotApi;
 use crate::api::rawreq::RawReq;
 use std::rc::Rc;
 
-pub fn run(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
+pub fn run(cfg: Config, lout: Arc<Lout>) -> TGBotResult<()> {
   match cfg.mode() {
     ConnectMode::Polling => self::polling(cfg, lout),
     ConnectMode::Webhook => Err(TGBotErrorKind::ComingSoon.into_with(|| "Coming soon.."))
@@ -22,18 +22,17 @@ pub fn run(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
 }
 
 
-fn polling(cfg: Arc<Config>, lout: Arc<Lout>) -> TGBotResult<()> {
+fn polling(cfg: Config, lout: Arc<Lout>) -> TGBotResult<()> {
   let token = cfg.token();
   let client = cfg.client();
   let rawreq = RawReq::new(Arc::new(client), token);
-  let api = BotApi::new(rawreq);
-  let stream = UpdatesStream::new(&api);
+  let api = Arc::new(BotApi::new(rawreq));
+  let stream = UpdatesStream::new(api.clone());
 
   let future = stream.for_each(move |update| {
-//    TGAdvancedHandler::new(&cfg, &lout, &api)
-//      .handle(update);
-
     debug!(tglog::telegram(), "UPDATE: {:?}", update);
+    TGAdvancedHandler::new(&lout, &api)
+      .handle(update);
     Ok(())
   }).map_err(|e| {
     // todo: some error handle.

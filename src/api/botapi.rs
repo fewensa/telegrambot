@@ -16,67 +16,76 @@ use crate::config::Config;
 use crate::errors::{TGBotError, TGBotErrorKind};
 use crate::tgfut::TGFuture;
 use crate::tglog;
-use crate::types::Update;
+use crate::types::{Update, User};
+use crate::api::get_me::GetMe;
 
 pub const TELEGRAM_API_URL: &'static str = "https://tgb.akafwtll.tk/";
 
 pub struct BotApi {
-  rawreq: RawReq,
+  futapi: BotFutApi,
 }
 
 impl BotApi {
   pub fn new(rawreq: RawReq) -> Self {
+    let futapi = BotFutApi { rawreq };
     BotApi {
-      rawreq
+      futapi
     }
   }
 
-  pub fn get_update(&self, get_updates: &GetUpdates) -> TGFuture<Option<Vec<Update>>> {
-    send(&self.rawreq, get_updates)
-//      .map(|item| item)
-//      .map_err(|e| e)
+  pub fn futapi(&self) -> &BotFutApi {
+    &self.futapi
   }
 
-//  pub fn get_me(&self) {
-////    let gm = GetMe;
-//    tokio::run(fetch());
-//  }
+
+  fn fnc_call<F, T>(&self, fnc: F, fut: TGFuture<Option<T>>)
+    where F: Fn((Option<T>, Option<TGBotError>)) + Send + Sync + Clone + 'static,
+          T: 'static {
+    let fnc_map = fnc.clone();
+    let fnc_map_err = fnc.clone();
+    tokio::spawn(fut.map(move |item| fnc_map((item, None)))
+      .map_err(move |e| fnc_map_err((None, Some(e)))));
+  }
+
+  pub fn get_me<F>(&self, fnc: F) where F: Fn((Option<User>, Option<TGBotError>)) + Send + Sync + Clone + 'static {
+    self.fnc_call(fnc, self.futapi().get_me())
+  }
 }
 
-fn send<Req: TGReq>(rawreq: &RawReq, req: &Req) -> TGFuture<Option<<Req::Resp as TGResp>::Type>> {
-  let request = futures::future::result(req.request());
-  let response = request.and_then(|httpreq| {
-    rawreq.request(httpreq)
-  });
-  let future = response.and_then(|httpresp| {
-    // let dez: Result<<Req::Resp as TGResp>::Type, TGBotError> =
-    Req::Resp::deserialize(httpresp)
-  });
-  TGFuture::new(Box::new(future))
-
-//  let future = fetch()
-//    .and_then(|a| {
-//      Ok(Some(Vec::new()))
-//    });
-//
-//  TGFuture::new(Box::new(future))
+pub struct BotFutApi {
+  rawreq: RawReq,
 }
 
-fn fetch() -> impl Future<Item=HttpResp, Error=TGBotError> {
-  Client::new()
-    .get("https://hyper.rs")
-    .send()
-    .and_then(|mut res| {
-      println!("{}", res.status());
+impl BotFutApi {
+  fn send<Req: TGReq>(&self, req: &Req) -> TGFuture<Option<<Req::Resp as TGResp>::Type>> {
+    let request = futures::future::result(req.request());
+    let rawreq = self.rawreq.clone();
+    let response = request.and_then(move |httpreq| {
+      rawreq.request(httpreq)
+    });
+    let future = response
+      .map(move |resp| {
+        let dez: Result<<Req::Resp as TGResp>::Type, TGBotError> = Req::Resp::deserialize(resp);
+        match dez {
+          Ok(ret) => Some(ret),
+          Err(err) => {
+            // todo: if error do more thing
+            error!(tglog::telegram(), "Call telegram api fail: {:?}", err);
+            None
+          }
+        }
+      }).map_err(|e| e);
+    TGFuture::new(Box::new(future))
+  }
 
-      let body = mem::replace(res.body_mut(), Decoder::empty());
-      body.concat2()
-    })
-    .map_err(|err| TGBotErrorKind::Other.into_err())
-    .and_then(|body| {
-      Ok(HttpResp {
-        body: Some(Vec::from(body.as_ref()))
-      })
-    })
+  pub fn get_update(&self, get_updates: &GetUpdates) -> TGFuture<Option<Vec<Update>>> {
+    self.send(get_updates)
+  }
+
+  pub fn get_me(&self) -> TGFuture<Option<User>> {
+    self.send(&GetMe)
+  }
 }
+
+
 

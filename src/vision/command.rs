@@ -1,6 +1,3 @@
-use std::num::ParseIntError;
-use std::str::ParseBoolError;
-
 use crate::types::MessageEntity;
 use crate::vision::message::Message;
 

@@ -20,6 +20,8 @@ pub struct Message {
   pub edit_date: Option<i64>,
   /// Message kind, Message | Channel
   pub chat: VMessagChat,
+  /// Message is edited
+  pub is_edited: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]

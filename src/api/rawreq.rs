@@ -1,4 +1,3 @@
-use std::rc::Rc;
 use std::sync::Arc;
 
 use error_chain_mini::ErrorKind;
@@ -9,7 +8,7 @@ use reqwest::Url;
 use crate::api::req::HttpReq;
 use crate::api::resp::HttpResp;
 use crate::api::TELEGRAM_API_URL;
-use crate::errors::{TGBotError, TGBotErrorKind};
+use crate::errors::TGBotErrorKind;
 use crate::tgfut::TGFuture;
 use crate::tglog;
 
@@ -29,7 +28,6 @@ impl RawReq {
 
   //  pub fn request(&self, httpreq: HttpReq) -> impl Future<Item=HttpResp, Error=TGBotError> {
   pub fn request(&self, httpreq: HttpReq) -> TGFuture<HttpResp> {
-
     let url = Url::parse(&format!("{}bot{}/{}", TELEGRAM_API_URL, self.token, httpreq.api)[..]).unwrap();
     let client = self.client.clone();
 
@@ -51,13 +49,13 @@ impl RawReq {
     };
 
     let fut = fut.and_then(|res| {
-        let body = res.into_body();
-        body.concat2()
-      })
+      let body = res.into_body();
+      body.concat2()
+    })
       .and_then(|buf| {
         if cfg!(debug_assertions) {
           match ::std::str::from_utf8(&buf) {
-            Ok(body) => debug!(tglog::telegram(), "RESPONSE BODY: {}", ::std::str::from_utf8(&buf).unwrap()),
+            Ok(body) => debug!(tglog::telegram(), "RESPONSE BODY: {}", body),
             Err(err) => error!(tglog::telegram(), "RESPONSE ERROR: {:?}", err)
           }
         }

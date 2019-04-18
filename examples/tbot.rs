@@ -1,7 +1,7 @@
 use std::env;
 
-use telegrambot::TelegramBot;
 use telegrambot::config::Config;
+use telegrambot::TelegramBot;
 
 fn main() {
   let token = env::var("TELEGRAM_BOT_TOKEN").unwrap();

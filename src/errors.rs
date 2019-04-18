@@ -5,13 +5,13 @@ use crate::api::RespParas;
 
 #[derive(ErrorKind)]
 pub enum TGBotErrorKind {
-    #[msg(short = "Client error", detailed = "inner: {:?}", _0)]
+  #[msg(short = "Client error", detailed = "inner: {:?}", _0)]
   ClientError(reqwest::Error),
-    #[msg(short = "Request error", detailed = "inner: {:?}", _0)]
+  #[msg(short = "Request error", detailed = "inner: {:?}", _0)]
   RequestError(reqwest::Error),
-    #[msg(short = "Request error", detailed = "inner: {:?}", _0)]
+  #[msg(short = "Request error", detailed = "inner: {:?}", _0)]
   ProxyError(reqwest::Error),
-    #[msg(short = "Json error", detailed = "inner: {:?}", _0)]
+  #[msg(short = "Json error", detailed = "inner: {:?}", _0)]
   JsonError(::serde_json::Error),
   TelegramError(String, Option<RespParas>),
   EmptyBody,

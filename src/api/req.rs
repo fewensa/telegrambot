@@ -1,13 +1,9 @@
-use std::sync::Arc;
-
-use reqwest::Method;
-
-use crate::api::resp::{HttpResp, TGResp};
-use crate::config::Config;
-use crate::errors::{TGBotErrorKind, TGBotResult};
-use crate::tgfut::TGFuture;
 use error_chain_mini::ErrorKind;
+use reqwest::Method;
 use serde::Serialize;
+
+use crate::api::resp::TGResp;
+use crate::errors::{TGBotErrorKind, TGBotResult};
 
 pub trait TGReq {
   type Resp: TGResp + 'static;

@@ -15,7 +15,7 @@ impl PossibilityMessage {
   }
 
   fn to_message(&self) -> Message {
-    advanced::to_message(&self.raw)
+    advanced::to_message(&self.raw, false)
   }
 
   pub fn with_text<F>(&self, fnc: F) -> &Self where F: Fn(&VTextMessage) {

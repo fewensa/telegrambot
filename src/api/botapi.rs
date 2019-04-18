@@ -1,23 +1,14 @@
-use std::{io, mem};
-use std::io::Cursor;
-use std::sync::Arc;
-
-use error_chain_mini::ErrorKind;
 use futures::future::Future;
-use futures::stream::Stream;
-use reqwest::r#async::{Client, Decoder};
 
+use crate::api::get_me::GetMe;
 use crate::api::get_updates::GetUpdates;
 use crate::api::rawreq::RawReq;
-use crate::api::req::{HttpReq, TGReq};
-use crate::api::resp::HttpResp;
+use crate::api::req::TGReq;
 use crate::api::TGResp;
-use crate::config::Config;
-use crate::errors::{TGBotError, TGBotErrorKind};
+use crate::errors::TGBotError;
 use crate::tgfut::TGFuture;
 use crate::tglog;
 use crate::types::{Update, User};
-use crate::api::get_me::GetMe;
 
 pub const TELEGRAM_API_URL: &'static str = "https://tgb.akafwtll.tk/";
 

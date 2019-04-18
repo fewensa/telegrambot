@@ -1,14 +1,15 @@
 use std::sync::Arc;
 
+use crate::advanced::text_handler;
+use crate::api::BotApi;
 use crate::listener::Lout;
 use crate::tglog;
 use crate::types::*;
 use crate::vision::*;
-use crate::advanced::text_handler;
-use crate::api::BotApi;
 
+// todo message is edited
 pub fn handle(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
-  let message = to_message(raw);
+  let message = to_message(raw, is_edited);
 
 
   macro_rules! maybe_field {
@@ -101,7 +102,7 @@ pub fn handle(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool)
 }
 
 
-pub fn to_message(raw: &RawMessage) -> Message {
+pub fn to_message(raw: &RawMessage, is_edited: bool) -> Message {
   Message {
     id: raw.message_id,
     from: raw.from.clone(),
@@ -111,6 +112,7 @@ pub fn to_message(raw: &RawMessage) -> Message {
     reply_to_message: raw.reply_to_message.clone().map(|raw| PossibilityMessage::new(*raw)),
     edit_date: raw.edit_date,
     chat: gen_chat(raw),
+    is_edited
   }
 }
 

@@ -1,11 +1,13 @@
 use std::sync::Arc;
-use crate::listener::Lout;
-use crate::types::{RawMessage, MessageEntityKind};
-use crate::vision::{Message, VTextMessage, VCommand};
-use text_reader::TextReader;
+
 use rstring_builder::StringBuilder;
-use crate::tglog;
+use text_reader::TextReader;
+
 use crate::api::BotApi;
+use crate::listener::Lout;
+use crate::tglog;
+use crate::types::{MessageEntityKind, RawMessage, MessageEntity};
+use crate::vision::{Message, VCommand, VTextMessage};
 
 pub fn handle_text(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, message: Message) {
   let text = raw.text.clone().unwrap();
@@ -21,11 +23,12 @@ pub fn handle_text(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, message: Me
 
   let first = entities.get(0).unwrap();
   if first.kind == MessageEntityKind::BotCommand {
-    handle_command(api, lout, raw, message, &text);
+    handle_command(api, lout, message, &text, entities);
   }
 }
 
-fn handle_command(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, message: Message, text: &String) {
+// todo: xxx
+fn handle_command(api: &BotApi, lout: &Arc<Lout>, message: Message, text: &String, entities: Vec<MessageEntity>) {
   let (command, args) = extra_command(text);
   debug!(tglog::advanced(), "COMMAND: {:?} => ARGS: {:?}", command, args);
 
@@ -33,10 +36,10 @@ fn handle_command(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, message: Mes
   if let Some(fnc) = lcd.get(&command[..]) {
     let vcmd = VCommand {
       message,
-      text: "".to_string(),
-      entities: vec![],
-      command: "".to_string(),
-      args: vec![]
+      text: text.clone(),
+      entities,
+      command,
+      args,
     };
     (*fnc)((api, &vcmd));
   }
@@ -50,7 +53,7 @@ fn extra_command(text: &String) -> (String, Vec<String>) {
   let mut args = Vec::new();
 
   let mut entry_command = false;
-  let mut check_command = false;
+//  let mut check_command = false;
   let mut quote_ch = None;
   let mut entry_quote = false;
   while reader.has_next() {
@@ -105,7 +108,7 @@ fn extra_command(text: &String) -> (String, Vec<String>) {
         }
         if entry_command {
           entry_command = false;
-          check_command = true;
+//          check_command = true;
           command = builder.string();
           builder.clear();
           continue;

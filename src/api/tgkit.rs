@@ -1,10 +1,9 @@
-use std::sync::Arc;
-
 use error_chain_mini::ErrorKind;
 use futures::future::Future;
 use futures::stream::Stream;
 use reqwest::Url;
 use serde::Serialize;
+use std::sync::Arc;
 
 use crate::api::resp::HttpResp;
 use crate::api::TGReq;

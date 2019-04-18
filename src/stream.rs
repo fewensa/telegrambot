@@ -7,15 +7,11 @@ use futures::{Async, Stream};
 use futures::future::Future;
 use tokio::timer::Interval;
 
-use crate::config::Config;
+use crate::api::{BotApi, GetUpdates};
 use crate::errors::TGBotError;
 use crate::errors::TGBotErrorKind;
 use crate::tgfut::TGFuture;
-use crate::tglog;
 use crate::types::Update;
-use crate::api::{rawreq, BotApi, TGReq, TGResp, GetUpdates};
-use crate::api::rawreq::RawReq;
-use std::rc::Rc;
 
 const TELEGRAM_LONG_POLL_TIMEOUT_SECONDS: i64 = 5;
 const TELEGRAM_LONG_POLL_ERROR_DELAY_MILLISECONDS: u64 = 500;

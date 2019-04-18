@@ -1,18 +1,17 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use crate::advanced::Track;
+use crate::api::BotApi;
 use crate::types::Update;
 use crate::vision::*;
-use crate::api::BotApi;
 
-#[derive(Debug, Eq, PartialEq, Hash)]
-pub enum ListenerType {
-  Text,
-  Command,
-  CallbackQuery,
-  Update,
-}
+//#[derive(Debug, Eq, PartialEq, Hash)]
+//pub enum ListenerType {
+//  Text,
+//  Command,
+//  CallbackQuery,
+//  Update,
+//}
 
 #[derive(Clone)]
 pub struct Listener {

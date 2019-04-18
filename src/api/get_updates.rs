@@ -1,13 +1,9 @@
-use std::sync::Arc;
-
 use reqwest::Method;
 
-use crate::api::{TGReq};
+use crate::api::TGReq;
 use crate::api::req::HttpReq;
-use crate::api::resp::{HttpResp, RespType};
-use crate::config::Config;
+use crate::api::resp::RespType;
 use crate::errors::TGBotResult;
-use crate::tgfut::TGFuture;
 use crate::types::Update;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]

@@ -2,13 +2,13 @@ use std::sync::Arc;
 
 use error_chain_mini::ErrorKind;
 
+use crate::api::BotApi;
 use crate::botrun;
 use crate::config::Config;
 use crate::errors::{TGBotErrorKind, TGBotResult};
 use crate::listener::{Listener, Lout};
 use crate::types::Update;
 use crate::vision::*;
-use crate::api::BotApi;
 
 pub struct TelegramBot {
   cfg: Config,

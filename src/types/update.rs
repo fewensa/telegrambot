@@ -13,10 +13,10 @@ pub struct Update {
   /// positive number and increase sequentially.
 //  #[serde(rename = "update_id")]
   pub id: i64,
-//  pub message: Option<RawMessage>,
+  //  pub message: Option<RawMessage>,
 //  pub callback_query: Option<CallbackQuery>,
   pub is_edited: bool,
-//  pub error: Option<String>,
+  //  pub error: Option<String>,
   pub kind: UpdateKind,
 }
 

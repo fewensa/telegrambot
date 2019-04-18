@@ -1,14 +1,9 @@
-use std::sync::Arc;
-
-use reqwest::Method;
-
-use crate::api::req::HttpReq;
-use crate::api::resp::{HttpResp, RespType};
 use crate::api::TGReq;
-use crate::config::Config;
-use crate::errors::TGBotResult;
-use crate::tgfut::TGFuture;
+use crate::api::resp::RespType;
 use crate::types::User;
+use crate::errors::TGBotResult;
+use crate::api::req::HttpReq;
+use reqwest::Method;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 pub struct GetMe;

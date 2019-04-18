@@ -3,11 +3,10 @@ use std::sync::Arc;
 
 use crate::advanced::message_handler;
 use crate::api::BotApi;
-use crate::config::Config;
 use crate::listener::Lout;
 use crate::tglog;
-use crate::types::{RawMessage, Update, UpdateKind};
-use crate::vision::{PossibilityMessage, VCallbackQuery, VMessagChat};
+use crate::types::{Update, UpdateKind};
+use crate::vision::{PossibilityMessage, VCallbackQuery};
 
 pub struct TGAdvancedHandler<'a> {
   lout: &'a Arc<Lout>,

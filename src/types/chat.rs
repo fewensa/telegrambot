@@ -14,7 +14,7 @@ pub struct User {
   /// User‘s or bot’s username.
   pub username: Option<String>,
   /// User is bot
-  pub is_bot: Option<bool>
+  pub is_bot: Option<bool>,
 }
 
 /// This object represents a group.
@@ -117,7 +117,7 @@ impl<'de> Deserialize<'de> for Chat {
           username: raw.username,
           first_name: required_field!(first_name),
           last_name: raw.last_name,
-          is_bot: raw.is_bot
+          is_bot: raw.is_bot,
         })
       }
       "group" => {
@@ -165,5 +165,5 @@ pub struct RawChat {
   /// True if a group has ‘All Members Are Admins’ enabled.
   pub all_members_are_administrators: Option<bool>,
   /// Is bot
-  pub is_bot: Option<bool>
+  pub is_bot: Option<bool>,
 }

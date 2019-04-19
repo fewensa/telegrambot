@@ -13,12 +13,15 @@ pub fn handle_text(api: BotApi, lout: &Arc<Lout>, raw: &RawMessage, message: Mes
   let text = raw.text.clone().unwrap();
   let entities = raw.entities.clone().unwrap_or_else(|| Vec::with_capacity(0));
 
+  debug!(tglog::advanced(), "entities is empty | {:?}", entities.is_empty());
+  debug!(tglog::advanced(), "entities => {:?}", entities);
   if entities.is_empty() {
     if let Some(fnc) = lout.listen_text() {
       let obj = VTextMessage { message, text, entities };
       (*fnc)((api, obj));
       return;
     }
+    return;
   }
 
   let first = entities.get(0).unwrap();
@@ -135,6 +138,28 @@ fn extra_command(text: &String) -> (String, Vec<String>) {
     args.push(builder.string());
   }
   builder.clear();
+
+
+  if command.contains("@") {
+    let mut reader = TextReader::new(command);
+    while reader.has_next() {
+      match reader.next() {
+        Some('@') => {
+          if reader.next() == Some('@') {
+            builder.append('@');
+            reader.back();
+            continue;
+          }
+          break;
+        },
+        Some(ch) => builder.append(ch),
+        None => continue,
+      };
+    }
+    let command = builder.string();
+    builder.clear();
+    return (command, args);
+  }
 
   (command, args)
 }

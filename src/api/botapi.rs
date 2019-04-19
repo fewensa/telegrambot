@@ -33,6 +33,7 @@ use crate::api::stop_message_live_location::StopMessageLiveLocation;
 use crate::api::TGResp;
 use crate::api::unban_chat_member::UnbanChatMember;
 use crate::api::unpin_chat_message::UnpinChatMessage;
+use crate::config::Config;
 use crate::errors::{TGBotError, TGBotResult};
 use crate::tgfut::TGFuture;
 use crate::tglog;
@@ -55,7 +56,7 @@ pub fn telegram_api_url() -> &'static str {
   }
 }
 
-pub fn spawn<F>(fut: F) where F: Future<Item = (), Error = ()> + 'static + Send {
+pub fn spawn<F>(fut: F) where F: Future<Item=(), Error=()> + 'static + Send {
   tokio::spawn(fut);
 }
 
@@ -65,9 +66,9 @@ pub struct BotApi {
 }
 
 impl BotApi {
-  pub fn new(rawreq: RawReq) -> Self {
+  pub fn new(cfg: Config) -> Self {
     BotApi {
-      rawreq
+      rawreq: RawReq::new(cfg.client(), cfg.token())
     }
   }
 
@@ -196,6 +197,5 @@ impl BotApi {
   pub fn unpin_chat_message(&self, req: &UnpinChatMessage) -> TGFuture<Option<()>> {
     self.send(req)
   }
-
 }
 

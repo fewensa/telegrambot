@@ -27,13 +27,13 @@ impl RawReq {
   }
 
   pub fn request(&self, httpreq: HttpReq) -> TGFuture<HttpResp> {
-    let url = Url::parse(&format!("{}/bot{}/{}", api::telegram_api_url(), self.token, httpreq.api)[..]).unwrap();
+    let url = Url::parse(&format!("{}/bot{}/{}", api::botapi::telegram_api_url(), self.token, httpreq.api)[..]).unwrap();
     let client = self.client.clone();
 
     let fut = match httpreq.body {
       Some(body) => {
         debug!(tglog::telegram(), "REQUEST URL => [{}]   REQUEST BODY => {}",
-               format!("{}/bot___/{}", api::telegram_api_url(), httpreq.api),
+               format!("{}/bot___/{}", api::botapi::telegram_api_url(), httpreq.api),
                body);
         client.request(httpreq.method, url)
           .header("content-type", "application/json")
@@ -42,7 +42,7 @@ impl RawReq {
       }
       None => {
         debug!(tglog::telegram(), "REQUEST URL => [{}]",
-               format!("{}/bot___/{}", api::telegram_api_url(), httpreq.api));
+               format!("{}/bot___/{}", api::botapi::telegram_api_url(), httpreq.api));
         client.request(httpreq.method, url).send()
       }
     };

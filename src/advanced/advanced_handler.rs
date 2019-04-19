@@ -22,7 +22,7 @@ impl<'a> TGAdvancedHandler<'a> {
   }
 
   pub fn handle(&self, update: Update) {
-    debug!(tglog::advanced(), "RAW MESSAGE: {:#?}", update);
+    debug!(tglog::advanced(), "UPDATE => {:#?}", update);
 
     if let Some(update_listener) = self.lout.listen_update() {
       (*update_listener)((self.api.clone(), update));

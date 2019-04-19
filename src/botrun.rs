@@ -14,10 +14,7 @@ use crate::stream::UpdatesStream;
 use crate::tglog;
 
 pub fn run(cfg: Config, lout: Arc<Lout>) -> TGBotResult<()> {
-  let token = cfg.token();
-  let client = cfg.client();
-  let rawreq = RawReq::new(client, token);
-  let api = BotApi::new(rawreq);
+  let api = BotApi::new(cfg.clone());
 
   match cfg.mode() {
     ConnectMode::Polling => self::polling(api, lout),
@@ -29,7 +26,6 @@ pub fn run(cfg: Config, lout: Arc<Lout>) -> TGBotResult<()> {
 fn polling(api: BotApi, lout: Arc<Lout>) -> TGBotResult<()> {
   let stream = UpdatesStream::new(api.clone());
   let future = stream.for_each(move |update| {
-    debug!(tglog::telegram(), "UPDATE: {:?}", update);
     TGAdvancedHandler::new(&lout, api.clone())
       .handle(update);
     Ok(())

@@ -32,7 +32,7 @@ impl TGReq for PinChatMessage {
 
 
 impl PinChatMessage {
-  fn new(chat: i64, message: i64) -> Self{
+  pub fn new(chat: i64, message: i64) -> Self{
     Self {
       chat_id: chat,
       message_id: message,

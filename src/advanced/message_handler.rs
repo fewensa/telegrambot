@@ -116,13 +116,13 @@ pub fn to_message(raw: &RawMessage, is_edited: bool) -> Message {
   }
 }
 
-fn gen_chat(raw: &RawMessage) -> VMessagChat {
+fn gen_chat(raw: &RawMessage) -> VMessageChat {
   match raw.chat {
-    Chat::Channel(ref channel) => VMessagChat::Channel(channel.clone()),
-    Chat::Private(ref user) => VMessagChat::Message(MessageChat::Private(user.clone())),
-    Chat::Group(ref group) => VMessagChat::Message(MessageChat::Group(group.clone())),
-    Chat::Supergroup(ref supergroup) => VMessagChat::Message(MessageChat::Supergroup(supergroup.clone())),
-    Chat::Unknown(ref rawchat) => VMessagChat::Message(MessageChat::Unknown(rawchat.clone()))
+    Chat::Channel(ref channel) => VMessageChat::Channel(channel.clone()),
+    Chat::Private(ref user) => VMessageChat::Message(MessageChat::Private(user.clone())),
+    Chat::Group(ref group) => VMessageChat::Message(MessageChat::Group(group.clone())),
+    Chat::Supergroup(ref supergroup) => VMessageChat::Message(MessageChat::Supergroup(supergroup.clone())),
+    Chat::Unknown(ref rawchat) => VMessageChat::Message(MessageChat::Unknown(rawchat.clone()))
   }
 }
 

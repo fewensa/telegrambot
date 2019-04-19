@@ -19,22 +19,52 @@ pub struct Message {
   /// Date the message was last edited in Unix time.
   pub edit_date: Option<i64>,
   /// Message kind, Message | Channel
-  pub chat: VMessagChat,
+  pub chat: VMessageChat,
   /// Message is edited
   pub is_edited: bool,
 }
 
+impl Message {
+  pub fn is_channel(&self) -> bool {
+    match self.chat {
+      VMessageChat::Channel(_) => true,
+      _ => false
+    }
+  }
+
+  pub fn is_group(&self) -> bool {
+    match self.chat {
+      VMessageChat::Message(MessageChat::Group(_)) => true,
+      _ => false
+    }
+  }
+
+  pub fn is_private(&self) -> bool {
+    match self.chat {
+      VMessageChat::Message(MessageChat::Private(_)) => true,
+      _ => false
+    }
+  }
+
+  pub fn is_supergroup(&self) -> bool {
+    match self.chat {
+      VMessageChat::Message(MessageChat::Supergroup(_)) => true,
+      _ => false
+    }
+  }
+}
+
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub enum VMessagChat {
+pub enum VMessageChat {
   Message(MessageChat),
   Channel(Channel),
 }
 
-impl VMessagChat {
+impl VMessageChat {
   pub fn id(&self) -> i64 {
     match *self {
-      VMessagChat::Message(ref x) => x.id(),
-      VMessagChat::Channel(ref x) => x.id
+      VMessageChat::Message(ref x) => x.id(),
+      VMessageChat::Channel(ref x) => x.id
     }
   }
 }

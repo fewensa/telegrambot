@@ -25,7 +25,7 @@ impl TGReq for UnpinChatMessage {
 }
 
 impl UnpinChatMessage {
-  fn new(chat: i64) -> Self {
+  pub fn new(chat: i64) -> Self {
     Self {
       chat_id: chat,
     }

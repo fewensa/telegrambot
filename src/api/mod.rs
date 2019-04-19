@@ -29,7 +29,6 @@ pub use self::unban_chat_member::*;
 pub use self::unpin_chat_message::*;
 
 pub mod rawreq;
-
 mod botapi;
 mod req;
 mod resp;

@@ -30,8 +30,14 @@ impl PossibilityMessage {
     advanced::to_message(&self.raw, false)
   }
 
-  pub fn raw<F>(&self, fnc: F) -> &Self where F: Fn(&RawMessage) {
+  pub fn with_raw<F>(&self, fnc: F) -> &Self where F: Fn(&RawMessage) {
     fnc(&self.raw);
+    self
+  }
+
+  pub fn with_message<F>(&self, fnc: F) -> &Self where F: Fn(&Message) {
+    let message = advanced::to_message(&self.raw, false);
+    fnc(&message);
     self
   }
 

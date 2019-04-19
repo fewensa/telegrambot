@@ -1,25 +1,13 @@
-use std::env;
-use std::mem;
-use std::sync::Arc;
-
-use futures::Stream;
-use futures::future::{Future, IntoFuture};
-use reqwest::r#async::{Client, Decoder};
+use futures::future::Future;
 
 use telegrambot::api::{BotApi, GetFile, SendMessage};
-use telegrambot::api::rawreq::RawReq;
-use telegrambot::config::Config;
 use telegrambot::TelegramBot;
 use telegrambot::types::{ParseMode, PhotoSize};
 
-fn main() {
-  let token = env::var("TELEGRAM_BOT_TOKEN").unwrap();
-  let cfg = Config::builder(token)
-    .proxy("http://127.0.0.1:1081")
-    .build()
-    .unwrap();
+mod config;
 
-  TelegramBot::new(cfg).unwrap()
+fn main() {
+  TelegramBot::new(config::config()).unwrap()
     .on_text(|(api, vtex)| {
       if let Some(reply) = &vtex.message.reply_to_message {
         reply.with_text(|vtex| {
@@ -31,7 +19,7 @@ fn main() {
       }
       println!("=====> TEXT: {:?}", vtex);
     })
-    .on_sticker( move |(api, sti)| {
+    .on_sticker(|(api, sti)| {
       println!("=====> STICKER: {:?} ===> FILEID: {:?}", sti, sti.sticker.file_id);
 
       let fileid = sti.sticker.thumb.clone().unwrap().file_id;
@@ -46,7 +34,6 @@ fn main() {
         })
         .map(|a| println!("{:?}", a))
         .map_err(|e| eprintln!("{:?}", e)));
-
     })
     .on_photo(|(api, pho)| {
       println!("=====> PHOTO: {:?}", pho);

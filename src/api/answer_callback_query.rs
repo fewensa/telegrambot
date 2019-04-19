@@ -35,7 +35,7 @@ impl<'t> TGReq for AnswerCallbackQuery<'t> {
 
 
 impl<'t> AnswerCallbackQuery<'t> {
-  fn new<T>(query: i64, text: T) -> Self
+  pub fn new<T>(query: i64, text: T) -> Self
     where
       T: Into<Cow<'t, str>> {
     Self {
@@ -47,7 +47,7 @@ impl<'t> AnswerCallbackQuery<'t> {
     }
   }
 
-  fn acknowledge(query: i64) -> Self {
+  pub fn acknowledge(query: i64) -> Self {
     Self {
       callback_query_id: query,
       text: None,

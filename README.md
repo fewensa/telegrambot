@@ -37,7 +37,8 @@ fn main() {
       let first_name = vtm.message.from.unwrap().first_name;
       println!("<{}>: {}", first_name, vtm.text);
       telegrambot::spawn(
-        api.send_message(&SendMessage::new(vtm.message.chat.id(), format!("Hi, {}! You just wrote '{}'", first_name, vtm.text)))
+        api.send_message(&SendMessage::new(vtm.message.chat.id(),
+         format!("Hi, {}! You just wrote '{}'", first_name, vtm.text)))
           .map(|_| {})
           .map_err(|_| {})
       );
@@ -66,14 +67,16 @@ fn main() {
   TelegramBot::new(cfg).unwrap()
     .on_command("/list", |(api, vcm)| {
       telegrambot::spawn(
-        api.send_message(&SendMessage::new(vcm.message.chat.id(), format!("Call list command")))
+        api.send_message(&SendMessage::new(vcm.message.chat.id(),
+         format!("Call list command")))
           .map(|_| {})
           .map_err(|_| {})
       );
     })
     .on_command("/page", |(api, vcm)| {
       telegrambot::spawn(
-        api.send_message(&SendMessage::new(vcm.message.chat.id(), format!("Call page command, and arguments for this command: {:?}", vcm.args)))
+        api.send_message(&SendMessage::new(vcm.message.chat.id(),
+         format!("Call page command, and arguments for this command: {:?}", vcm.args)))
           .map(|_| {})
           .map_err(|_| {})
       );

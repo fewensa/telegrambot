@@ -6,10 +6,9 @@ use reqwest::Method;
 use crate::api::req::HttpReq;
 use crate::api::resp::RespType;
 use crate::api::TGReq;
-use crate::errors::{TGBotResult, TGBotErrorKind};
+use crate::errors::TGBotResult;
 use crate::types::*;
 use crate::vision::PossibilityMessage;
-use error_chain_mini::ErrorKind;
 
 /// Use this method to send text messages.
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]

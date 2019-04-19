@@ -1,4 +1,3 @@
-use core::borrow::Borrow;
 use std::sync::Arc;
 
 use crate::advanced::message_handler;

@@ -4,7 +4,6 @@ use crate::api::req::HttpReq;
 use crate::api::resp::{JsonTrueToUnitResp, RespType};
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
-use crate::types::*;
 
 /// Strongly typed ChatAction. Instead of passing a String to the
 /// `chat_action` method, this is used.

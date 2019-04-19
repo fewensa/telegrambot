@@ -34,7 +34,7 @@ use crate::api::TGResp;
 use crate::api::unban_chat_member::UnbanChatMember;
 use crate::api::unpin_chat_message::UnpinChatMessage;
 use crate::config::Config;
-use crate::errors::{TGBotError, TGBotResult};
+use crate::errors::TGBotError;
 use crate::tgfut::TGFuture;
 use crate::tglog;
 use crate::types::*;

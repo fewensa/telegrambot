@@ -3,10 +3,9 @@ use std::ops::Not;
 use reqwest::Method;
 
 use crate::api::req::HttpReq;
-use crate::api::resp::{JsonTrueToUnitResp, RespType};
+use crate::api::resp::JsonTrueToUnitResp;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
-use crate::types::*;
 
 /// Use this method to pin a message in a supergroup or a channel.
 /// The bot must be an administrator in the chat for this to work

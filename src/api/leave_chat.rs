@@ -1,10 +1,9 @@
 use reqwest::Method;
 
 use crate::api::req::HttpReq;
-use crate::api::resp::{JsonTrueToUnitResp, RespType};
+use crate::api::resp::JsonTrueToUnitResp;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
-use crate::types::*;
 
 /// Use this method for your bot to leave a group, supergroup or channel.
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]

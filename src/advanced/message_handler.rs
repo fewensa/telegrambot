@@ -3,7 +3,6 @@ use std::sync::Arc;
 use crate::advanced::text_handler;
 use crate::api::BotApi;
 use crate::listener::Lout;
-use crate::tglog;
 use crate::types::*;
 use crate::vision::*;
 

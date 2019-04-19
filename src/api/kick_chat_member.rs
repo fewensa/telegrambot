@@ -4,7 +4,6 @@ use crate::api::req::HttpReq;
 use crate::api::resp::{RespType, JsonTrueToUnitResp};
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
-use crate::types::*;
 
 /// Use this method to kick a user from a group or a supergroup.
 /// In the case of supergroups, the user will not be able to return to the group on

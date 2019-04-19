@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use error_chain_mini::ErrorKind;
 use futures::{Future, Stream};
 use reqwest::r#async::Client;

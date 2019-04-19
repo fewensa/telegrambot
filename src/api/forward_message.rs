@@ -6,7 +6,6 @@ use crate::api::req::HttpReq;
 use crate::api::resp::RespType;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
-use crate::types::*;
 use crate::vision::PossibilityMessage;
 
 /// Use this method to forward messages of any kind.

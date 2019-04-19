@@ -1,10 +1,9 @@
 use reqwest::Method;
 
 use crate::api::req::HttpReq;
-use crate::api::resp::{RespType, JsonTrueToUnitResp};
+use crate::api::resp::JsonTrueToUnitResp;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
-use crate::types::*;
 
 /// Use this method to unban a previously kicked user in a supergroup or channel.
 /// The user will not return to the group or channel automatically, but will be able to

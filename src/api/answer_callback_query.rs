@@ -6,7 +6,7 @@ use reqwest::Method;
 use crate::api::req::HttpReq;
 use crate::api::resp::JsonTrueToUnitResp;
 use crate::api::TGReq;
-use crate::errors::{TGBotErrorKind, TGBotResult};
+use crate::errors::TGBotResult;
 
 /// Use this method to send answers to callback queries sent from inline keyboards.
 /// The answer will be displayed to the user as a notification at the top of

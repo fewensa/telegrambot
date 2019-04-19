@@ -5,7 +5,6 @@ use crate::api::resp::RespType;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
 use crate::types::*;
-use crate::vision::PossibilityMessage;
 use std::borrow::Cow;
 
 /// Use this method to get basic info about a file and prepare it for downloading.

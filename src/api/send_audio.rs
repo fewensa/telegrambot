@@ -1,13 +1,13 @@
-use std::ops::Not;
 use std::borrow::Cow;
+use std::ops::Not;
 
+use reqwest::Method;
 
 use crate::api::req::HttpReq;
-use crate::api::resp::{RespType, JsonTrueToUnitResp};
+use crate::api::resp::JsonTrueToUnitResp;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
 use crate::types::*;
-use reqwest::Method;
 
 /// Use this method to send an audio
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]

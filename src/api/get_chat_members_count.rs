@@ -4,7 +4,6 @@ use crate::api::req::HttpReq;
 use crate::api::resp::RespType;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
-use crate::types::*;
 
 /// Use this method to get the number of members in a chat.
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]

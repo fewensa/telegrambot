@@ -25,7 +25,7 @@ pub enum TGBotErrorKind {
 pub type TGBotError = ChainedError<TGBotErrorKind>;
 pub type TGBotResult<T> = Result<T, TGBotError>;
 
-//// todo: only development
+//// todox: only development
 //impl ErrorKind for TGBotErrorKind {
 //  fn short(&self) -> &str {
 //    match self {

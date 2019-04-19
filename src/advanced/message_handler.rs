@@ -7,7 +7,6 @@ use crate::tglog;
 use crate::types::*;
 use crate::vision::*;
 
-// todo message is edited
 pub fn handle(api: BotApi, lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
   let message = to_message(raw, is_edited);
 

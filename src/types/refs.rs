@@ -283,7 +283,7 @@
 ////}
 //
 ///// Unique message identifier inside a chat.
-//// todo necessity
+//// todox necessity
 //#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 //pub struct MessageId(i64);
 //integer_id_impls!(MessageId);

@@ -18,7 +18,7 @@ const TELEGRAM_LONG_POLL_ERROR_DELAY_MILLISECONDS: u64 = 500;
 
 pub struct UpdatesStream {
   //    interval: Interval,
-  api: Arc<BotApi>,
+  api: BotApi,
   error_interval: Interval,
   last_update: i64,
   buffer: VecDeque<Update>,
@@ -26,7 +26,7 @@ pub struct UpdatesStream {
 }
 
 impl UpdatesStream {
-  pub fn new(api: Arc<BotApi>) -> Self {
+  pub fn new(api: BotApi) -> Self {
     UpdatesStream {
       api,
 //      interval: Interval::new_interval(Duration::from_secs(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS)),
@@ -54,7 +54,7 @@ impl Stream for UpdatesStream {
 
     let api = self.api.clone();
     let upfut = self.updates.get_or_insert_with(|| {
-      api.futapi().get_update(GetUpdates::new()
+      api.get_update(GetUpdates::new()
         .offset(last_update + 1)
         .timeout(TELEGRAM_LONG_POLL_TIMEOUT_SECONDS))
     });

@@ -13,11 +13,11 @@ use crate::vision::PossibilityMessage;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct ForwardMessage {
-  chat_id: ChatRef,
-  from_chat_id: ChatRef,
+  chat_id: i64,
+  from_chat_id: i64,
   #[serde(skip_serializing_if = "Not::not")]
   disable_notification: bool,
-  message_id: MessageId,
+  message_id: i64,
 }
 
 impl TGReq for ForwardMessage {
@@ -29,29 +29,17 @@ impl TGReq for ForwardMessage {
 }
 
 impl ForwardMessage {
-  pub fn new<M, F, T>(message: M, from: F, to: T) -> Self
-    where M: ToMessageId, F: ToChatRef, T: ToChatRef {
+  pub fn new(message: i64, from: i64, to: i64) -> Self  {
     ForwardMessage {
-      chat_id: to.to_chat_ref(),
-      from_chat_id: from.to_chat_ref(),
+      chat_id: to,
+      from_chat_id: from,
       disable_notification: false,
-      message_id: message.to_message_id(),
+      message_id: message,
     }
   }
 
   pub fn disable_notification(&mut self) -> &mut Self {
     self.disable_notification = true;
     self
-  }
-}
-
-/// Forward message.
-pub trait CanForwardMessage {
-  fn forward<T>(&self, to: T) -> ForwardMessage where T: ToChatRef;
-}
-
-impl<M> CanForwardMessage for M where M: ToMessageId + ToSourceChat {
-  fn forward<T>(&self, to: T) -> ForwardMessage where T: ToChatRef {
-    ForwardMessage::new(self.to_message_id(), self.to_source_chat(), to)
   }
 }

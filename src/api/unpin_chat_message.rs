@@ -13,7 +13,7 @@ use crate::types::*;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct UnpinChatMessage {
-  chat_id: ChatRef,
+  chat_id: i64,
 }
 
 impl TGReq for UnpinChatMessage {
@@ -25,19 +25,9 @@ impl TGReq for UnpinChatMessage {
 }
 
 impl UnpinChatMessage {
-  fn new<C>(chat: C) -> Self where C: ToChatRef {
+  fn new(chat: i64) -> Self {
     Self {
-      chat_id: chat.to_chat_ref(),
+      chat_id: chat,
     }
-  }
-}
-
-pub trait CanUnpinMessage {
-  fn unpin_message(&self) -> UnpinChatMessage;
-}
-
-impl<C> CanUnpinMessage for C where C: ToChatRef {
-  fn unpin_message(&self) -> UnpinChatMessage {
-    UnpinChatMessage::new(self)
   }
 }

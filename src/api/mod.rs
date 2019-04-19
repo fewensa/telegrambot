@@ -1,5 +1,5 @@
 pub use self::answer_callback_query::*;
-pub use self::botapi::{BotApi, BotFutApi, TELEGRAM_API_URL};
+pub use self::botapi::{BotApi, spawn, TELEGRAM_API_URL};
 pub use self::delete_message::*;
 pub use self::edit_message_caption::*;
 pub use self::edit_message_live_location::*;

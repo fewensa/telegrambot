@@ -5,7 +5,7 @@ use crate::api::req::HttpReq;
 use crate::api::resp::RespType;
 use crate::api::TGReq;
 use crate::errors::TGBotErrorKind;
-use crate::types::{ChatRef, MessageId, ReplyMarkup, ToChatRef, ToMessageId, ToSourceChat};
+use crate::types::ReplyMarkup;
 use crate::vision::PossibilityMessage;
 
 /// Use this method to edit live location messages sent by the bot.
@@ -14,8 +14,8 @@ use crate::vision::PossibilityMessage;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct EditMessageLiveLocation {
-  chat_id: ChatRef,
-  message_id: MessageId,
+  chat_id: i64,
+  message_id: i64,
   latitude: f32,
   longitude: f32,
   #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,11 +31,10 @@ impl TGReq for EditMessageLiveLocation {
 }
 
 impl EditMessageLiveLocation {
-  pub fn new<C, M>(chat: C, message_id: M, latitude: f32, longitude: f32) -> Self
-    where C: ToChatRef, M: ToMessageId {
+  pub fn new(chat: i64, message_id: i64, latitude: f32, longitude: f32) -> Self {
     EditMessageLiveLocation {
-      chat_id: chat.to_chat_ref(),
-      message_id: message_id.to_message_id(),
+      chat_id: chat,
+      message_id,
       latitude,
       longitude,
       reply_markup: None,
@@ -45,16 +44,5 @@ impl EditMessageLiveLocation {
   pub fn reply_markup<R>(&mut self, reply_markup: R) -> &mut Self where R: Into<ReplyMarkup> {
     self.reply_markup = Some(reply_markup.into());
     self
-  }
-}
-
-/// Edit live location messages sent by the bot.
-pub trait CanEditMessageLiveLocation {
-  fn edit_live_location(&self, latitude: f32, longitude: f32) -> EditMessageLiveLocation;
-}
-
-impl<M> CanEditMessageLiveLocation for M where M: ToMessageId + ToSourceChat {
-  fn edit_live_location(&self, latitude: f32, longitude: f32) -> EditMessageLiveLocation {
-    EditMessageLiveLocation::new(self.to_source_chat(), self.to_message_id(), latitude, longitude)
   }
 }

@@ -14,23 +14,23 @@ use crate::stream::UpdatesStream;
 use crate::tglog;
 
 pub fn run(cfg: Config, lout: Arc<Lout>) -> TGBotResult<()> {
+  let token = cfg.token();
+  let client = cfg.client();
+  let rawreq = RawReq::new(client, token);
+  let api = BotApi::new(rawreq);
+
   match cfg.mode() {
-    ConnectMode::Polling => self::polling(cfg, lout),
+    ConnectMode::Polling => self::polling(api, lout),
     ConnectMode::Webhook => Err(TGBotErrorKind::ComingSoon.into_with(|| "Coming soon.."))
   }
 }
 
 
-fn polling(cfg: Config, lout: Arc<Lout>) -> TGBotResult<()> {
-  let token = cfg.token();
-  let client = cfg.client();
-  let rawreq = RawReq::new(Arc::new(client), token);
-  let api = Arc::new(BotApi::new(rawreq));
+fn polling(api: BotApi, lout: Arc<Lout>) -> TGBotResult<()> {
   let stream = UpdatesStream::new(api.clone());
-
   let future = stream.for_each(move |update| {
     debug!(tglog::telegram(), "UPDATE: {:?}", update);
-    TGAdvancedHandler::new(&lout, &api)
+    TGAdvancedHandler::new(&lout, api.clone())
       .handle(update);
     Ok(())
   }).map_err(|e| {

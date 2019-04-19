@@ -12,8 +12,8 @@ use crate::vision::PossibilityMessage;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct StopMessageLiveLocation {
-  chat_id: ChatRef,
-  message_id: MessageId,
+  chat_id: i64,
+  message_id: i64,
   #[serde(skip_serializing_if = "Option::is_none")]
   reply_markup: Option<ReplyMarkup>,
 }
@@ -28,11 +28,10 @@ impl TGReq for StopMessageLiveLocation {
 }
 
 impl StopMessageLiveLocation {
-  pub fn new<C, M>(chat: C, message_id: M) -> Self
-    where C: ToChatRef, M: ToMessageId {
+  pub fn new(chat: i64, message_id: i64) -> Self {
     StopMessageLiveLocation {
-      chat_id: chat.to_chat_ref(),
-      message_id: message_id.to_message_id(),
+      chat_id: chat,
+      message_id,
       reply_markup: None,
     }
   }
@@ -40,16 +39,5 @@ impl StopMessageLiveLocation {
   pub fn reply_markup<R>(&mut self, reply_markup: R) -> &mut Self where R: Into<ReplyMarkup> {
     self.reply_markup = Some(reply_markup.into());
     self
-  }
-}
-
-/// Stop updating a live location message sent by the bot.
-pub trait CanStopMessageLiveLocation {
-  fn stop_live_location(&self) -> StopMessageLiveLocation;
-}
-
-impl<M> CanStopMessageLiveLocation for M where M: ToMessageId + ToSourceChat {
-  fn stop_live_location(&self) -> StopMessageLiveLocation {
-    StopMessageLiveLocation::new(self.to_source_chat(), self.to_message_id())
   }
 }

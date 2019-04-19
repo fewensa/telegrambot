@@ -1,25 +1,23 @@
 use std::env;
+use std::mem;
+use std::sync::Arc;
 
-use telegrambot::api::{GetFile, SendMessage, BotApi};
+use futures::Stream;
+use futures::future::{Future, IntoFuture};
+use reqwest::r#async::{Client, Decoder};
+
+use telegrambot::api::{BotApi, GetFile, SendMessage};
+use telegrambot::api::rawreq::RawReq;
 use telegrambot::config::Config;
 use telegrambot::TelegramBot;
-use telegrambot::types::{ToChatRef, ParseMode};
-use futures::future::{Future, IntoFuture};
-use telegrambot::api::rawreq::RawReq;
-use std::sync::Arc;
+use telegrambot::types::{ParseMode, PhotoSize};
 
 fn main() {
   let token = env::var("TELEGRAM_BOT_TOKEN").unwrap();
-//  let cfg = Config::new(token);
-//  let cfg = Config { token, mode: ConnectMode::Polling };
-  let a = token.clone();
   let cfg = Config::builder(token)
-//    .proxy("http://127.0.0.1:1081")
+    .proxy("http://127.0.0.1:1081")
     .build()
     .unwrap();
-
-  let rawreq = RawReq::new(Arc::new(cfg.client().clone()), a);
-  let botapi = Arc::new(BotApi::new(rawreq));
 
   TelegramBot::new(cfg).unwrap()
     .on_text(|(api, vtex)| {
@@ -33,52 +31,21 @@ fn main() {
       }
       println!("=====> TEXT: {:?}", vtex);
     })
-    .on_sticker(move |(api, sti)| {
+    .on_sticker( move |(api, sti)| {
       println!("=====> STICKER: {:?} ===> FILEID: {:?}", sti, sti.sticker.file_id);
-      let thumbs = &sti.sticker.thumb;
-      println!("THUMBS: {:?}", thumbs);
-//      let futapi = botapi.futapi();
 
-      let fut = botapi.futapi()
-        .get_file(&GetFile::new(thumbs.clone().unwrap()));
-      let fut = fut.and_then(|file| botapi.futapi().send_message(
-            SendMessage::new(sti.message.chat.clone(), file.unwrap().file_id)
-              .parse_mode(ParseMode::Markdown)
-          ));
-      let fut = fut.map(|a| println!("{:?}", a))
-        .map_err(|e| eprintln!("{:?}", e));
-      tokio::spawn(fut);
+      let fileid = sti.sticker.thumb.clone().unwrap().file_id;
+      let chat = sti.message.chat.id();
 
-//      let (tx, rx) = futures::sync::oneshot::channel();
-//
-//      api.futapi()
-//        .get_file(&GetFile::new(thumbs.clone().unwrap()))
-//        .select(api.futapi()
-//          .get_file(&GetFile::new(thumbs.clone().unwrap())))
-//        .map(|a|{})
-//        .map_err(|e|{});
-//
-//      tokio::spawn(api.futapi()
-//        .get_file(&GetFile::new(thumbs.clone().unwrap()))
-//        .map(|file| {
-//          println!("+=========> {:?}", file);
-//          tx.send(file);
-//        })
-//        .map_err(|e| eprintln!("{:?}", e))
-//      );
-//
-//
-//      let a = rx.map(|file|{
-//        println!("got: {:?}", file);
-//        let fut = api.futapi().send_message(
-//            SendMessage::new(sti.message.chat.clone(), file.unwrap().file_id)
-//              .parse_mode(ParseMode::Markdown)
-//          )
-//          .map(|a| {})
-//          .map_err(|e| eprintln!("{:?}", e));
-//        tokio::spawn(fut);
-//      }).wait();
-
+      telegrambot::spawn(api.get_file(&GetFile::new(fileid))
+        .and_then(move |file| {
+          println!("{:?}", file);
+          api.send_message(
+            SendMessage::new(chat, file.unwrap().file_id)
+              .parse_mode(ParseMode::Markdown))
+        })
+        .map(|a| println!("{:?}", a))
+        .map_err(|e| eprintln!("{:?}", e)));
 
     })
     .on_photo(|(api, pho)| {
@@ -97,15 +64,11 @@ fn main() {
       if cmd.message.is_edited {
         return;
       }
-//      let result1 = api.get_me();
-      api.futapi().spawn(
-        api.futapi()
-          .send_message(SendMessage::new(cmd.message.chat.clone(), "*Hello*")
-            .parse_mode(ParseMode::Markdown))
-          .join(api.futapi().get_me())
-          .map(|(a, b)| {})
-          .map_err(|e| {})
-      );
+      telegrambot::api::spawn(api.send_message(SendMessage::new(cmd.message.chat.clone().id(), "*Hello*")
+        .parse_mode(ParseMode::Markdown))
+        .join(api.get_me())
+        .map(|(a, b)| {})
+        .map_err(|e| {}));
       println!("=====> COMMAND /list  {:?}", cmd);
     })
     .start()

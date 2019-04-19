@@ -30,6 +30,11 @@ impl PossibilityMessage {
     advanced::to_message(&self.raw, false)
   }
 
+  pub fn raw<F>(&self, fnc: F) -> &Self where F: Fn(&RawMessage) {
+    fnc(&self.raw);
+    self
+  }
+
   pub fn with_text<F>(&self, fnc: F) -> &Self where F: Fn(&VTextMessage) {
     if let Some(text) = &self.raw.text {
       let message = self.to_message();

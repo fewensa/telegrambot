@@ -15,6 +15,7 @@ extern crate slog;
 extern crate slog_term;
 
 pub use self::telegram_bot::TelegramBot;
+pub use self::api::spawn;
 
 mod telegram_bot;
 mod stream;

@@ -10,8 +10,8 @@ use crate::types::*;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct GetChatMember {
-  chat_id: ChatRef,
-  user_id: UserId,
+  chat_id: i64,
+  user_id: i64,
 }
 
 
@@ -25,32 +25,10 @@ impl TGReq for GetChatMember {
 
 
 impl GetChatMember {
-  pub fn new<C, U>(chat: C, user: U) -> Self where C: ToChatRef, U: ToUserId {
+  pub fn new(chat: i64, user: i64) -> Self {
     GetChatMember {
-      chat_id: chat.to_chat_ref(),
-      user_id: user.to_user_id(),
+      chat_id: chat,
+      user_id: user,
     }
-  }
-}
-
-/// Get information about a member of a chat.
-pub trait CanGetChatMemberForChat {
-  fn get_member<O>(&self, other: O) -> GetChatMember where O: ToUserId;
-}
-
-impl<C> CanGetChatMemberForChat for C where C: ToChatRef {
-  fn get_member<O>(&self, other: O) -> GetChatMember where O: ToUserId {
-    GetChatMember::new(self, other)
-  }
-}
-
-/// Get information about a member of a chat.
-pub trait CanGetChatMemberForUser {
-  fn get_member_from<O>(&self, other: O) -> GetChatMember where O: ToChatRef;
-}
-
-impl<U> CanGetChatMemberForUser for U where U: ToUserId {
-  fn get_member_from<O>(&self, other: O) -> GetChatMember where O: ToChatRef {
-    GetChatMember::new(other, self)
   }
 }

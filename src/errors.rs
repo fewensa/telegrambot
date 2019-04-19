@@ -14,7 +14,7 @@ pub enum TGBotErrorKind {
   #[msg(short = "Json error", detailed = "inner: {:?}", _0)]
   JsonError(::serde_json::Error),
   TelegramError(String, Option<RespParas>),
-  CanotSendMessage(&'static str),
+//  CanotSendMessage(&'static str),
   EmptyBody,
   LoseToken,
   ComingSoon,

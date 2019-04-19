@@ -10,7 +10,7 @@ use crate::types::*;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct GetChatMembersCount {
-  chat_id: ChatRef
+  chat_id: i64
 }
 
 
@@ -23,20 +23,9 @@ impl TGReq for GetChatMembersCount {
 }
 
 impl GetChatMembersCount {
-  pub fn new<C>(chat: C) -> Self where C: ToChatRef {
+  pub fn new(chat: i64) -> Self {
     GetChatMembersCount {
-      chat_id: chat.to_chat_ref()
+      chat_id: chat
     }
-  }
-}
-
-/// Get the number of members in a chat.
-pub trait CanGetChatMembersCount {
-  fn get_members_count(&self) -> GetChatMembersCount;
-}
-
-impl<C> CanGetChatMembersCount for C where C: ToChatRef {
-  fn get_members_count(&self) -> GetChatMembersCount {
-    GetChatMembersCount::new(self)
   }
 }

@@ -6,15 +6,15 @@ use crate::api::req::HttpReq;
 use crate::api::resp::RespType;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
-use crate::types::{ChatRef, MessageId, RawMessage, ReplyMarkup, ToChatRef, ToMessageId, ToSourceChat};
+use crate::types::{RawMessage, ReplyMarkup};
 use crate::vision::PossibilityMessage;
 
 /// Use this method to edit captions of messages sent by the bot.
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct EditMessageCaption<'s> {
-  chat_id: ChatRef,
-  message_id: MessageId,
+  chat_id: i64,
+  message_id: i64,
   caption: Cow<'s, str>,
   #[serde(skip_serializing_if = "Option::is_none")]
   reply_markup: Option<ReplyMarkup>,
@@ -29,11 +29,11 @@ impl<'s> TGReq for EditMessageCaption<'s> {
 }
 
 impl<'s> EditMessageCaption<'s> {
-  pub fn new<C, M, T>(chat: C, message_id: M, caption: T) -> Self
-    where C: ToChatRef, M: ToMessageId, T: Into<Cow<'s, str>> {
+  pub fn new<T>(chat: i64, message_id: i64, caption: T) -> Self
+    where T: Into<Cow<'s, str>> {
     EditMessageCaption {
-      chat_id: chat.to_chat_ref(),
-      message_id: message_id.to_message_id(),
+      chat_id: chat,
+      message_id,
       caption: caption.into(),
       reply_markup: None,
     }
@@ -42,16 +42,5 @@ impl<'s> EditMessageCaption<'s> {
   pub fn reply_markup<R>(&mut self, reply_markup: R) -> &mut Self where R: Into<ReplyMarkup> {
     self.reply_markup = Some(reply_markup.into());
     self
-  }
-}
-
-/// Edit captions of messages sent by the bot.
-pub trait CanEditMessageCaption {
-  fn edit_caption<'s, T>(&self, caption: T) -> EditMessageCaption<'s> where T: Into<Cow<'s, str>>;
-}
-
-impl<M> CanEditMessageCaption for M where M: ToMessageId + ToSourceChat {
-  fn edit_caption<'s, T>(&self, caption: T) -> EditMessageCaption<'s> where T: Into<Cow<'s, str>> {
-    EditMessageCaption::new(self.to_source_chat(), self.to_message_id(), caption)
   }
 }

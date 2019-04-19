@@ -10,14 +10,14 @@ use crate::vision::{PossibilityMessage, VCallbackQuery};
 
 pub struct TGAdvancedHandler<'a> {
   lout: &'a Arc<Lout>,
-  api: &'a BotApi,
+  api: BotApi,
 }
 
 impl<'a> TGAdvancedHandler<'a> {
-  pub fn new(lout: &'a Arc<Lout>, api: &'a Arc<BotApi>) -> Self {
+  pub fn new(lout: &'a Arc<Lout>, api: BotApi) -> Self {
     TGAdvancedHandler {
       lout,
-      api: api.borrow(),
+      api,
     }
   }
 
@@ -25,19 +25,19 @@ impl<'a> TGAdvancedHandler<'a> {
     debug!(tglog::advanced(), "RAW MESSAGE: {:#?}", update);
 
     if let Some(update_listener) = self.lout.listen_update() {
-      (*update_listener)((self.api, &update));
+      (*update_listener)((self.api.clone(), update));
       return;
     }
 
     match &update.kind {
       UpdateKind::Message(ref raw) => {
         info!(tglog::advanced(), "{} | INCOMMING MESSAGE: {:?}", if update.is_edited { "EDITED" } else { "POST" }, raw);
-        message_handler::handle(self.api, &self.lout, raw, update.is_edited);
+        message_handler::handle(self.api.clone(), &self.lout, raw, update.is_edited);
         return;
       }
       UpdateKind::Channel(ref raw) => {
         info!(tglog::advanced(), "{} | INCOMMING CHANNEL MESSAGE: {:?}", if update.is_edited { "EDITED" } else { "POST" }, raw);
-        message_handler::handle(self.api, &self.lout, raw, update.is_edited);
+        message_handler::handle(self.api.clone(), &self.lout, raw, update.is_edited);
         return;
       }
       UpdateKind::CallbackQuery(ref callback_query) => {
@@ -50,7 +50,7 @@ impl<'a> TGAdvancedHandler<'a> {
             chat_instance: callback_query.chat_instance.clone(),
             data: callback_query.data.clone(),
           };
-          (*fnc)((self.api, &vcq));
+          (*fnc)((self.api.clone(), vcq));
           return;
         }
       }
@@ -64,7 +64,7 @@ impl<'a> TGAdvancedHandler<'a> {
         error!(tglog::advanced(), "ERROR LOG END");
         error!(tglog::advanced(), "=====================================================");
         if let Some(fnc) = self.lout.listen_error() {
-          (&fnc)((self.api, err));
+          (&fnc)((self.api.clone(), err.clone()));
           return;
         }
       }
@@ -79,7 +79,7 @@ impl<'a> TGAdvancedHandler<'a> {
         error!(tglog::advanced(), "ERROR LOG END");
         error!(tglog::advanced(), "=====================================================");
         if let Some(fnc) = self.lout.listen_error() {
-          (&fnc)((self.api, &notice));
+          (&fnc)((self.api.clone(), notice));
           return;
         }
       }

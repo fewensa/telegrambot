@@ -12,8 +12,8 @@ use crate::types::*;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct UnbanChatMember {
-  chat_id: ChatRef,
-  user_id: UserId,
+  chat_id: i64,
+  user_id: i64,
 }
 
 
@@ -27,32 +27,10 @@ impl TGReq for UnbanChatMember {
 
 
 impl UnbanChatMember {
-  pub fn new<C, U>(chat: C, user: U) -> Self where C: ToChatRef, U: ToUserId {
+  pub fn new(chat: i64, user: i64) -> Self {
     UnbanChatMember {
-      chat_id: chat.to_chat_ref(),
-      user_id: user.to_user_id(),
+      chat_id: chat,
+      user_id: user,
     }
-  }
-}
-
-/// Unban a previously kicked user in a supergroup or channel.
-pub trait CanUnbanChatMemberForChat {
-  fn unban<O>(&self, other: O) -> UnbanChatMember where O: ToUserId;
-}
-
-impl<C> CanUnbanChatMemberForChat for C where C: ToChatRef {
-  fn unban<O>(&self, other: O) -> UnbanChatMember where O: ToUserId {
-    UnbanChatMember::new(self, other)
-  }
-}
-
-/// Unban a previously kicked user in a supergroup or channel.
-pub trait CanUnbanChatMemberForUser {
-  fn unban_in<O>(&self, other: O) -> UnbanChatMember where O: ToChatRef;
-}
-
-impl<U> CanUnbanChatMemberForUser for U where U: ToUserId {
-  fn unban_in<O>(&self, other: O) -> UnbanChatMember where O: ToChatRef {
-    UnbanChatMember::new(other, self)
   }
 }

@@ -1,10 +1,10 @@
-use crate::types::{CallbackQueryId, User};
+use crate::types::*;
 use crate::vision::possibility::PossibilityMessage;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct VCallbackQuery {
   /// Unique identifier for this query
-  pub id: CallbackQueryId,
+  pub id: i64,
   /// Sender
   pub from: User,
   /// Message with the callback button that originated the query.

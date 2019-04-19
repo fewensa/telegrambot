@@ -3,7 +3,7 @@ use std::ops::Not;
 
 use reqwest::Method;
 
-use crate::api::req::{HttpReq, ToRequest, ToReplyRequest};
+use crate::api::req::HttpReq;
 use crate::api::resp::RespType;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
@@ -14,7 +14,7 @@ use crate::vision::PossibilityMessage;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct SendVenue<'t, 'a, 'f> {
-  chat_id: ChatRef,
+  chat_id: i64,
   latitude: f32,
   longitude: f32,
   title: Cow<'t, str>,
@@ -24,7 +24,7 @@ pub struct SendVenue<'t, 'a, 'f> {
   #[serde(skip_serializing_if = "Not::not")]
   disable_notification: bool,
   #[serde(skip_serializing_if = "Option::is_none")]
-  reply_to_message_id: Option<MessageId>,
+  reply_to_message_id: Option<i64>,
   #[serde(skip_serializing_if = "Option::is_none")]
   reply_markup: Option<ReplyMarkup>,
 }
@@ -39,15 +39,14 @@ impl<'t, 'a, 'f> TGReq for SendVenue<'t, 'a, 'f> {
 }
 
 impl<'t, 'a, 'f> SendVenue<'t, 'a, 'f> {
-  pub fn new<C, T, A>(chat: C, latitude: f32, longitude: f32, title: T, address: A) -> Self
-    where C: ToChatRef,
-          T: Into<Cow<'t, str>>,
+  pub fn new<T, A>(chat: i64, latitude: f32, longitude: f32, title: T, address: A) -> Self
+    where T: Into<Cow<'t, str>>,
           A: Into<Cow<'a, str>>
   {
     SendVenue {
-      chat_id: chat.to_chat_ref(),
-      latitude: latitude,
-      longitude: longitude,
+      chat_id: chat,
+      latitude,
+      longitude,
       title: title.into(),
       address: address.into(),
       disable_notification: false,
@@ -69,10 +68,8 @@ impl<'t, 'a, 'f> SendVenue<'t, 'a, 'f> {
     self
   }
 
-  pub fn reply_to<R>(&mut self, to: R) -> &mut Self
-    where R: ToMessageId
-  {
-    self.reply_to_message_id = Some(to.to_message_id());
+  pub fn reply_to(&mut self, to: i64) -> &mut Self {
+    self.reply_to_message_id = Some(to);
     self
   }
 
@@ -81,88 +78,5 @@ impl<'t, 'a, 'f> SendVenue<'t, 'a, 'f> {
   {
     self.reply_markup = Some(reply_markup.into());
     self
-  }
-}
-
-/// Send information about a venue.
-pub trait CanSendVenue<'t, 'a, 'f> {
-  fn venue<T, A>(&self,
-                 latitude: f32,
-                 longitude: f32,
-                 title: T,
-                 address: A)
-                 -> SendVenue<'t, 'a, 'f>
-    where T: Into<Cow<'t, str>>,
-          A: Into<Cow<'a, str>>;
-}
-
-impl<'t, 'a, 'f, C> CanSendVenue<'t, 'a, 'f> for C
-  where C: ToChatRef
-{
-  fn venue<T, A>(&self,
-                 latitude: f32,
-                 longitude: f32,
-                 title: T,
-                 address: A)
-                 -> SendVenue<'t, 'a, 'f>
-    where T: Into<Cow<'t, str>>,
-          A: Into<Cow<'a, str>>
-  {
-    SendVenue::new(self, latitude, longitude, title, address)
-  }
-}
-
-/// Reply with information about a venue.
-pub trait CanReplySendVenue {
-  fn venue_reply<'t, 'a, 'f, T, A>(&self,
-                                   latitude: f32,
-                                   longitude: f32,
-                                   title: T,
-                                   address: A)
-                                   -> SendVenue<'t, 'a, 'f>
-    where T: Into<Cow<'t, str>>,
-          A: Into<Cow<'a, str>>;
-}
-
-impl<M> CanReplySendVenue for M where M: ToMessageId + ToSourceChat {
-  fn venue_reply<'t, 'a, 'f, T, A>(&self,
-                                   latitude: f32,
-                                   longitude: f32,
-                                   title: T,
-                                   address: A)
-                                   -> SendVenue<'t, 'a, 'f>
-    where T: Into<Cow<'t, str>>,
-          A: Into<Cow<'a, str>>
-  {
-    let mut rq = self.to_source_chat().venue(latitude, longitude, title, address);
-    rq.reply_to(self.to_message_id());
-    rq
-  }
-}
-
-impl<'b> ToRequest<'b> for Venue {
-  type Request = SendVenue<'b, 'b, 'b>;
-
-  fn to_request<C>(&'b self, chat: C) -> Self::Request where C: ToChatRef {
-    let mut rq = chat.venue(self.location.latitude, self.location.longitude,
-                            self.title.as_str(), self.address.as_str());
-    if let Some(ref foursquare_id) = self.foursquare_id {
-      rq.foursquare_id(foursquare_id.as_str());
-    }
-    rq
-  }
-}
-
-impl<'b> ToReplyRequest<'b> for Venue {
-  type Request = SendVenue<'b, 'b, 'b>;
-
-  fn to_reply_request<M>(&'b self, message: M) -> Self::Request
-    where M: ToMessageId + ToSourceChat {
-    let mut rq = message.venue_reply(self.location.latitude, self.location.longitude,
-                                     self.title.as_str(), self.address.as_str());
-    if let Some(ref foursquare_id) = self.foursquare_id {
-      rq.foursquare_id(foursquare_id.as_str());
-    }
-    rq
   }
 }

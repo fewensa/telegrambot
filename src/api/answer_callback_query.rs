@@ -7,7 +7,6 @@ use crate::api::req::HttpReq;
 use crate::api::resp::JsonTrueToUnitResp;
 use crate::api::TGReq;
 use crate::errors::{TGBotErrorKind, TGBotResult};
-use crate::types::{CallbackQueryId, ToCallbackQueryId};
 
 /// Use this method to send answers to callback queries sent from inline keyboards.
 /// The answer will be displayed to the user as a notification at the top of
@@ -15,7 +14,7 @@ use crate::types::{CallbackQueryId, ToCallbackQueryId};
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct AnswerCallbackQuery<'t> {
-  callback_query_id: CallbackQueryId,
+  callback_query_id: i64,
   #[serde(skip_serializing_if = "Option::is_none")]
   text: Option<Cow<'t, str>>,
   #[serde(skip_serializing_if = "Not::not")]
@@ -36,12 +35,11 @@ impl<'t> TGReq for AnswerCallbackQuery<'t> {
 
 
 impl<'t> AnswerCallbackQuery<'t> {
-  fn new<Q, T>(query: Q, text: T) -> Self
+  fn new<T>(query: i64, text: T) -> Self
     where
-      Q: ToCallbackQueryId,
       T: Into<Cow<'t, str>> {
     Self {
-      callback_query_id: query.to_callback_query_id(),
+      callback_query_id: query,
       text: Some(text.into()),
       show_alert: false,
       url: None,
@@ -49,9 +47,9 @@ impl<'t> AnswerCallbackQuery<'t> {
     }
   }
 
-  fn acknowledge<Q>(query: Q) -> Self where Q: ToCallbackQueryId {
+  fn acknowledge(query: i64) -> Self {
     Self {
-      callback_query_id: query.to_callback_query_id(),
+      callback_query_id: query,
       text: None,
       show_alert: false,
       url: None,
@@ -85,22 +83,3 @@ impl<'t> AnswerCallbackQuery<'t> {
     self
   }
 }
-
-/// Send answers to callback queries sent from inline keyboards.
-pub trait CanAnswerCallbackQuery {
-  fn answer<'t, T>(&self, text: T) -> AnswerCallbackQuery<'t> where T: Into<Cow<'t, str>>;
-
-  fn acknowledge<'t>(&self) -> AnswerCallbackQuery<'t>;
-}
-
-impl<Q> CanAnswerCallbackQuery for Q where Q: ToCallbackQueryId {
-  fn answer<'t, T>(&self, text: T) -> AnswerCallbackQuery<'t> where T: Into<Cow<'t, str>>,
-  {
-    AnswerCallbackQuery::new(&self, text)
-  }
-
-  fn acknowledge<'t>(&self) -> AnswerCallbackQuery<'t> {
-    AnswerCallbackQuery::acknowledge(&self)
-  }
-}
-

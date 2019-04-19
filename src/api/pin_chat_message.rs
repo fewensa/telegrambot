@@ -15,8 +15,8 @@ use crate::types::*;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct PinChatMessage {
-  chat_id: ChatRef,
-  message_id: MessageId,
+  chat_id: i64,
+  message_id: i64,
   #[serde(skip_serializing_if = "Not::not")]
   disable_notification: bool,
 }
@@ -32,10 +32,10 @@ impl TGReq for PinChatMessage {
 
 
 impl PinChatMessage {
-  fn new<C, M>(chat: C, message: M) -> Self where C: ToChatRef, M: ToMessageId {
+  fn new(chat: i64, message: i64) -> Self{
     Self {
-      chat_id: chat.to_chat_ref(),
-      message_id: message.to_message_id(),
+      chat_id: chat,
+      message_id: message,
       disable_notification: false,
     }
   }
@@ -43,15 +43,5 @@ impl PinChatMessage {
   pub fn disable_notification(&mut self) -> &mut Self {
     self.disable_notification = true;
     self
-  }
-}
-
-pub trait CanPinMessage {
-  fn pin(&self) -> PinChatMessage;
-}
-
-impl<M> CanPinMessage for M where M: ToMessageId + ToSourceChat {
-  fn pin(&self) -> PinChatMessage {
-    PinChatMessage::new(self.to_source_chat(), self.to_message_id())
   }
 }

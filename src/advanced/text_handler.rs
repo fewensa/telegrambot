@@ -9,14 +9,14 @@ use crate::tglog;
 use crate::types::{MessageEntityKind, RawMessage, MessageEntity};
 use crate::vision::{Message, VCommand, VTextMessage};
 
-pub fn handle_text(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, message: Message) {
+pub fn handle_text(api: BotApi, lout: &Arc<Lout>, raw: &RawMessage, message: Message) {
   let text = raw.text.clone().unwrap();
   let entities = raw.entities.clone().unwrap_or_else(|| Vec::with_capacity(0));
 
   if entities.is_empty() {
     if let Some(fnc) = lout.listen_text() {
       let obj = VTextMessage { message, text, entities };
-      (*fnc)((api, &obj));
+      (*fnc)((api, obj));
       return;
     }
   }
@@ -27,8 +27,7 @@ pub fn handle_text(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, message: Me
   }
 }
 
-// todo: xxx
-fn handle_command(api: &BotApi, lout: &Arc<Lout>, message: Message, text: &String, entities: Vec<MessageEntity>) {
+fn handle_command(api: BotApi, lout: &Arc<Lout>, message: Message, text: &String, entities: Vec<MessageEntity>) {
   let (command, args) = extra_command(text);
   debug!(tglog::advanced(), "COMMAND: {:?} => ARGS: {:?}", command, args);
 
@@ -41,7 +40,7 @@ fn handle_command(api: &BotApi, lout: &Arc<Lout>, message: Message, text: &Strin
       command,
       args,
     };
-    (*fnc)((api, &vcmd));
+    (*fnc)((api, vcmd));
   }
 }
 

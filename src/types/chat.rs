@@ -6,7 +6,7 @@ use crate::types::*;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash, Deserialize)]
 pub struct User {
   /// Unique identifier for this user or bot.
-  pub id: UserId,
+  pub id: i64,
   /// User‘s or bot’s first name.
   pub first_name: String,
   /// User‘s or bot’s last name.
@@ -15,13 +15,14 @@ pub struct User {
   pub username: Option<String>,
   /// User is bot
   pub is_bot: Option<bool>,
+  // language_code
 }
 
 /// This object represents a group.
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash, Deserialize)]
 pub struct Group {
   /// Unique identifier for this chat.
-  pub id: GroupId,
+  pub id: i64,
   /// Title, for supergroups, channels and group chats.
   pub title: String,
   /// True if a group has ‘All Members Are Admins’ enabled.
@@ -32,7 +33,7 @@ pub struct Group {
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash, Deserialize)]
 pub struct Supergroup {
   /// Unique identifier for this chat.
-  pub id: SupergroupId,
+  pub id: i64,
   /// Title, for supergroups, channels and group chats.
   pub title: String,
   /// Username for supergroup.
@@ -43,7 +44,7 @@ pub struct Supergroup {
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash, Deserialize)]
 pub struct Channel {
   /// Unique identifier for this chat.
-  pub id: ChannelId,
+  pub id: i64,
   /// Title, for supergroups, channels and group chats.
   pub title: String,
   /// Username for channel.
@@ -62,12 +63,12 @@ pub enum MessageChat {
 }
 
 impl MessageChat {
-  pub fn id(&self) -> ChatId {
+  pub fn id(&self) -> i64 {
     match *self {
-      MessageChat::Private(ref x) => x.id.into(),
-      MessageChat::Group(ref x) => x.id.into(),
-      MessageChat::Supergroup(ref x) => x.id.into(),
-      MessageChat::Unknown(ref x) => x.id.into(),
+      MessageChat::Private(ref x) => x.id,
+      MessageChat::Group(ref x) => x.id,
+      MessageChat::Supergroup(ref x) => x.id,
+      MessageChat::Unknown(ref x) => x.id,
     }
   }
 }
@@ -84,7 +85,7 @@ pub enum Chat {
 }
 
 impl Chat {
-  pub fn id(&self) -> ChatId {
+  pub fn id(&self) -> i64 {
     match *self {
       Chat::Private(ref x) => x.id.into(),
       Chat::Group(ref x) => x.id.into(),
@@ -113,7 +114,7 @@ impl<'de> Deserialize<'de> for Chat {
     Ok(match raw.type_.as_ref() {
       "private" => {
         Chat::Private(User {
-          id: raw.id.into(),
+          id: raw.id,
           username: raw.username,
           first_name: required_field!(first_name),
           last_name: raw.last_name,
@@ -122,21 +123,21 @@ impl<'de> Deserialize<'de> for Chat {
       }
       "group" => {
         Chat::Group(Group {
-          id: raw.id.into(),
+          id: raw.id,
           title: required_field!(title),
           all_members_are_administrators: required_field!(all_members_are_administrators),
         })
       }
       "supergroup" => {
         Chat::Supergroup(Supergroup {
-          id: raw.id.into(),
+          id: raw.id,
           title: required_field!(title),
           username: raw.username,
         })
       }
       "channel" => {
         Chat::Channel(Channel {
-          id: raw.id.into(),
+          id: raw.id,
           title: required_field!(title),
           username: raw.username,
         })

@@ -13,8 +13,8 @@ use crate::types::*;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct KickChatMember {
-  chat_id: ChatRef,
-  user_id: UserId,
+  chat_id: i64,
+  user_id: i64,
 }
 
 
@@ -27,32 +27,10 @@ impl TGReq for KickChatMember {
 }
 
 impl KickChatMember {
-  pub fn new<C, U>(chat: C, user: U) -> Self where C: ToChatRef, U: ToUserId {
+  pub fn new(chat: i64, user: i64) -> Self {
     KickChatMember {
-      chat_id: chat.to_chat_ref(),
-      user_id: user.to_user_id(),
+      chat_id: chat,
+      user_id: user,
     }
-  }
-}
-
-/// Kick a user from a group or a supergroup.
-pub trait CanKickChatMemberForChat {
-  fn kick<O>(&self, other: O) -> KickChatMember where O: ToUserId;
-}
-
-impl<C> CanKickChatMemberForChat for C where C: ToChatRef {
-  fn kick<O>(&self, other: O) -> KickChatMember where O: ToUserId {
-    KickChatMember::new(self, other)
-  }
-}
-
-/// Kick a user from a group or a supergroup.
-pub trait CanKickChatMemberForUser {
-  fn kick_from<O>(&self, other: O) -> KickChatMember where O: ToChatRef;
-}
-
-impl<U> CanKickChatMemberForUser for U where U: ToUserId {
-  fn kick_from<O>(&self, other: O) -> KickChatMember where O: ToChatRef {
-    KickChatMember::new(other, self)
   }
 }

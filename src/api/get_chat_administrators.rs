@@ -12,7 +12,7 @@ use crate::types::*;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct GetChatAdministrators {
-  chat_id: ChatRef
+  chat_id: i64
 }
 
 
@@ -25,20 +25,9 @@ impl TGReq for GetChatAdministrators {
 }
 
 impl GetChatAdministrators {
-  pub fn new<C>(chat: C) -> Self where C: ToChatRef {
+  pub fn new(chat: i64) -> Self {
     GetChatAdministrators {
-      chat_id: chat.to_chat_ref()
+      chat_id: chat
     }
-  }
-}
-
-/// Get a list of administrators in a chat.
-pub trait CanGetChatAdministrators {
-  fn get_administrators(&self) -> GetChatAdministrators;
-}
-
-impl<C> CanGetChatAdministrators for C where C: ToChatRef {
-  fn get_administrators(&self) -> GetChatAdministrators {
-    GetChatAdministrators::new(self)
   }
 }

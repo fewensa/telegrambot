@@ -13,7 +13,7 @@ use reqwest::Method;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct SendAudio<'s, 'c, 'p, 't> {
-  chat_id: ChatRef,
+  chat_id: i64,
   audio: Cow<'s, str>,
   #[serde(skip_serializing_if = "Option::is_none")]
   caption: Option<Cow<'c, str>>,
@@ -26,7 +26,7 @@ pub struct SendAudio<'s, 'c, 'p, 't> {
   #[serde(skip_serializing_if = "Option::is_none")]
   title: Option<Cow<'t, str>>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  reply_to_message_id: Option<MessageId>,
+  reply_to_message_id: Option<i64>,
   #[serde(skip_serializing_if = "Not::not")]
   disable_notification: bool,
   #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,13 +44,12 @@ impl<'s, 'c, 'p, 't> TGReq for SendAudio<'s, 'c, 'p, 't> {
 
 
 impl<'s, 'c, 'p, 't> SendAudio<'s, 'c, 'p, 't> {
-  pub fn with_url<C, T>(chat: C, url: T) -> Self
+  pub fn with_url<T>(chat: i64, url: T) -> Self
     where
-      C: ToChatRef,
       T: Into<Cow<'s, str>>,
   {
     Self {
-      chat_id: chat.to_chat_ref(),
+      chat_id: chat,
       audio: url.into(),
       caption: None,
       parse_mode: None,
@@ -97,11 +96,8 @@ impl<'s, 'c, 'p, 't> SendAudio<'s, 'c, 'p, 't> {
     self
   }
 
-  pub fn reply_to<R>(&mut self, to: R) -> &mut Self
-    where
-      R: ToMessageId,
-  {
-    self.reply_to_message_id = Some(to.to_message_id());
+  pub fn reply_to(&mut self, to: i64) -> &mut Self {
+    self.reply_to_message_id = Some(to);
     self
   }
 
@@ -111,45 +107,5 @@ impl<'s, 'c, 'p, 't> SendAudio<'s, 'c, 'p, 't> {
   {
     self.reply_markup = Some(reply_markup.into());
     self
-  }
-}
-
-/// Can reply with an audio
-pub trait CanReplySendAudio {
-  fn audio_url_reply<'s, 'c, 'p, 't, T>(&self, url: T) -> SendAudio<'s, 'c, 'p, 't>
-    where
-      T: Into<Cow<'s, str>>;
-}
-
-impl<M> CanReplySendAudio for M
-  where
-    M: ToMessageId + ToSourceChat,
-{
-  fn audio_url_reply<'s, 'c, 'p, 't, T>(&self, url: T) -> SendAudio<'s, 'c, 'p, 't>
-    where
-      T: Into<Cow<'s, str>>,
-  {
-    let mut req = SendAudio::with_url(self.to_source_chat(), url);
-    req.reply_to(self);
-    req
-  }
-}
-
-/// Send an audio
-pub trait CanSendAudio {
-  fn audio_url<'s, 'c, 'p, 't, T>(&self, url: T) -> SendAudio<'s, 'c, 'p, 't>
-    where
-      T: Into<Cow<'s, str>>;
-}
-
-impl<M> CanSendAudio for M
-  where
-    M: ToChatRef,
-{
-  fn audio_url<'s, 'c, 'p, 't, T>(&self, url: T) -> SendAudio<'s, 'c, 'p, 't>
-    where
-      T: Into<Cow<'s, str>>,
-  {
-    SendAudio::with_url(self.to_chat_ref(), url)
   }
 }

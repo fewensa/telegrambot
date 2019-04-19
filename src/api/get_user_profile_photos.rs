@@ -10,7 +10,7 @@ use crate::types::*;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct GetUserProfilePhotos {
-  user_id: UserId,
+  user_id: i64,
   offset: Option<i64>,
   limit: Option<i64>,
 }
@@ -26,9 +26,9 @@ impl TGReq for GetUserProfilePhotos {
 
 
 impl GetUserProfilePhotos {
-  pub fn new<U>(user: U) -> Self where U: ToUserId {
+  pub fn new(user: i64) -> Self{
     GetUserProfilePhotos {
-      user_id: user.to_user_id(),
+      user_id: user,
       offset: None,
       limit: None,
     }
@@ -42,16 +42,5 @@ impl GetUserProfilePhotos {
   pub fn limit(&mut self, limit: i64) -> &mut Self {
     self.limit = Some(limit);
     self
-  }
-}
-
-/// Get a list of profile pictures for a user.
-pub trait CanGetUserProfilePhotos {
-  fn get_user_profile_photos(&self) -> GetUserProfilePhotos;
-}
-
-impl<'b, U> CanGetUserProfilePhotos for U where U: ToUserId {
-  fn get_user_profile_photos(&self) -> GetUserProfilePhotos {
-    GetUserProfilePhotos::new(self)
   }
 }

@@ -14,12 +14,12 @@ use crate::tglog;
 
 #[derive(Debug, Clone)]
 pub struct RawReq {
-  client: Arc<Client>,
+  client: Client,
   token: String,
 }
 
 impl RawReq {
-  pub fn new(client: Arc<Client>, token: String) -> Self {
+  pub fn new(client: Client, token: String) -> Self {
     RawReq {
       client,
       token,

@@ -4,7 +4,6 @@ use crate::api::req::HttpReq;
 use crate::api::resp::JsonTrueToUnitResp;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
-use crate::types::{ChatRef, MessageId, ToChatRef, ToMessageId, ToSourceChat};
 
 // Use this method to delete a message.
 // A message can only be deleted if it was sent less than 48 hours ago.
@@ -17,8 +16,8 @@ use crate::types::{ChatRef, MessageId, ToChatRef, ToMessageId, ToSourceChat};
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 #[must_use = "requests do nothing unless sent"]
 pub struct DeleteMessage {
-  chat_id: ChatRef,
-  message_id: MessageId,
+  chat_id: i64,
+  message_id: i64,
 }
 
 impl TGReq for DeleteMessage {
@@ -30,22 +29,10 @@ impl TGReq for DeleteMessage {
 }
 
 impl DeleteMessage {
-  pub fn new<C, M>(chat: C, message_id: M) -> Self
-    where C: ToChatRef, M: ToMessageId {
+  pub fn new(chat: i64, message_id: i64) -> Self {
     DeleteMessage {
-      chat_id: chat.to_chat_ref(),
-      message_id: message_id.to_message_id(),
+      chat_id: chat,
+      message_id,
     }
-  }
-}
-
-/// Delete messages..
-pub trait CanDeleteMessage {
-  fn delete(&self) -> DeleteMessage;
-}
-
-impl<M> CanDeleteMessage for M where M: ToMessageId + ToSourceChat {
-  fn delete(&self) -> DeleteMessage {
-    DeleteMessage::new(self.to_source_chat(), self.to_message_id())
   }
 }

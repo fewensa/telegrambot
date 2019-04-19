@@ -8,7 +8,7 @@ use crate::types::*;
 use crate::vision::*;
 
 // todo message is edited
-pub fn handle(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
+pub fn handle(api: BotApi, lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool) {
   let message = to_message(raw, is_edited);
 
 
@@ -20,7 +20,7 @@ pub fn handle(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool)
           $field: val.clone(),
         };
         if let Some(fnc) = lout.$fnc() {
-          (*fnc)((api, &obj));
+          (*fnc)((api, obj));
         }
         return;
       }
@@ -36,7 +36,7 @@ pub fn handle(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool)
             $field: val.clone(),
             caption: raw.caption.clone(),
           };
-          (*fnc)((api, &obj));
+          (*fnc)((api, obj));
           return;
         }
       }
@@ -53,7 +53,7 @@ pub fn handle(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool)
             caption: raw.caption.clone(),
             media_group_id: raw.media_group_id.clone()
           };
-          (*fnc)((api, &obj));
+          (*fnc)((api, obj));
           return;
         }
       }
@@ -64,7 +64,7 @@ pub fn handle(api: &BotApi, lout: &Arc<Lout>, raw: &RawMessage, is_edited: bool)
     ($name:ident, $fnc:ident) => {{
       if let Some(fnc) = lout.$fnc() {
         if let Some(True) = &raw.$name {
-          (*fnc)((api, &message));
+          (*fnc)((api, message));
           return;
         }
       }

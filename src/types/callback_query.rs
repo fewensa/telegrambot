@@ -1,12 +1,11 @@
 use crate::types::chat::User;
 use crate::types::message::RawMessage;
-use crate::types::refs::CallbackQueryId;
 
 /// This object represents an incoming callback query from a callback button in an inline keyboard.
 #[derive(Debug, Clone, PartialEq, PartialOrd, Deserialize)]
 pub struct CallbackQuery {
   /// Unique identifier for this query
-  pub id: CallbackQueryId,
+  pub id: i64,
   /// Sender
   pub from: User,
   /// Message with the callback button that originated the query.

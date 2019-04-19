@@ -30,11 +30,11 @@ pub enum VMessagChat {
   Channel(Channel),
 }
 
-impl ToChatRef for VMessagChat {
-  fn to_chat_ref(&self) -> ChatRef {
+impl VMessagChat {
+  pub fn id(&self) -> i64 {
     match *self {
-      VMessagChat::Message(ref chat) => chat.to_chat_ref(),
-      VMessagChat::Channel(ref chat) => ChatRef::ChannelUsername(chat.title.clone())
+      VMessagChat::Message(ref x) => x.id(),
+      VMessagChat::Channel(ref x) => x.id
     }
   }
 }

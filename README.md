@@ -96,7 +96,7 @@ Support for parameter analysis. Some example:
 
   args: ["Just do it", "from now on"]
 
-- `/run "Just do it`
+- `/run 'Just do it'`
 
   args: ["Just do it"]
 

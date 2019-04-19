@@ -1,3 +1,5 @@
+use std::env;
+
 use futures::future::Future;
 
 use crate::api::answer_callback_query::AnswerCallbackQuery;
@@ -37,8 +39,21 @@ use crate::tglog;
 use crate::types::*;
 use crate::vision::PossibilityMessage;
 
-//pub const TELEGRAM_API_URL: &'static str = "https://tgb.akafwtll.tk/";
-pub const TELEGRAM_API_URL: &'static str = "https://api.telegram.org/";
+//pub const TELEGRAM_API_URL: &'static str = "https://tgb.akafwtll.tk";
+//pub const TELEGRAM_API_URL: &'static str = "https://api.telegram.org";
+
+//lazy_static! {
+//  /// Documentation!
+//  pub static ref TELEGRAM_API_URL: &'static str = "https://api.telegram.org";
+//}
+
+
+pub fn telegram_api_url() -> &'static str {
+  match env::var("TELEGRAM_API_URL") {
+    Ok(url) => Box::leak(url.into_boxed_str()),
+    Err(_) => "https://api.telegram.org"
+  }
+}
 
 pub fn spawn<F>(fut: F) where F: Future<Item = (), Error = ()> + 'static + Send {
   tokio::spawn(fut);

@@ -63,7 +63,7 @@ impl<R: JsonResp> TGResp for R where <R as JsonResp>::Raw: DeserializeOwned {
               Ok(<Self as JsonResp>::map(result))
             }
             RespWrapper::Error { description, parameters } => {
-              Err(TGBotErrorKind::TelegramError(description, parameters).into_err())
+              Err(TGBotErrorKind::TGError(description, parameters).into_err())
             }
           }
         }

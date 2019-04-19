@@ -22,7 +22,6 @@ use crate::api::leave_chat::LeaveChat;
 use crate::api::pin_chat_message::PinChatMessage;
 use crate::api::rawreq::RawReq;
 use crate::api::req::TGReq;
-use crate::api::resp::JsonTrueToUnitResp;
 use crate::api::send_audio::SendAudio;
 use crate::api::send_chat_action::SendChatAction;
 use crate::api::send_contact::SendContact;
@@ -111,6 +110,10 @@ impl BotApi {
   }
 
   pub fn edit_message_caption(&self, req: &EditMessageCaption) -> TGFuture<Option<PossibilityMessage>> {
+    self.send(req)
+  }
+
+  pub fn edit_message_live_location(&self, req: &EditMessageLiveLocation) -> TGFuture<Option<PossibilityMessage>> {
     self.send(req)
   }
 

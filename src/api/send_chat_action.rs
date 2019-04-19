@@ -1,7 +1,7 @@
 use reqwest::Method;
 
 use crate::api::req::HttpReq;
-use crate::api::resp::{JsonTrueToUnitResp, RespType};
+use crate::api::resp::JsonTrueToUnitResp;
 use crate::api::TGReq;
 use crate::errors::TGBotResult;
 

@@ -14,6 +14,15 @@ impl Incoming {
     }
   }
 
+  pub fn from(&self) -> Option<User> {
+    match self.update.clone().kind {
+      UpdateKind::CallbackQuery(cq) => Some(cq.from),
+      UpdateKind::Channel(raw) => raw.from,
+      UpdateKind::Message(raw) => raw.from,
+      _ => None
+    }
+  }
+
   pub fn is_edited(&self) -> bool {
     self.update.is_edited
   }

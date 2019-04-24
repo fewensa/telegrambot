@@ -6,7 +6,7 @@ use text_reader::TextReader;
 use crate::api::BotApi;
 use crate::listener::Lout;
 use crate::tglog;
-use crate::types::{MessageEntityKind, RawMessage, MessageEntity};
+use crate::types::{MessageEntity, MessageEntityKind, RawMessage};
 use crate::vision::{Message, VCommand, VTextMessage};
 
 pub fn handle_text(api: BotApi, lout: &Arc<Lout>, raw: &RawMessage, message: Message) {
@@ -34,16 +34,27 @@ fn handle_command(api: BotApi, lout: &Arc<Lout>, message: Message, text: &String
   let (command, args) = extra_command(text);
   debug!(tglog::advanced(), "COMMAND: {:?} => ARGS: {:?}", command, args);
 
+  let vcmd = VCommand {
+    message,
+    text: text.clone(),
+    entities,
+    command: command.clone(),
+    args,
+  };
+
   let lcd = lout.listen_command();
+
   if let Some(fnc) = lcd.get(&command[..]) {
-    let vcmd = VCommand {
-      message,
-      text: text.clone(),
-      entities,
-      command,
-      args,
-    };
+    if let Some(lp) = lout.listen_precommand() {
+      (*lp)((api.clone(), vcmd.clone()));
+    }
+
     (*fnc)((api, vcmd));
+    return;
+  }
+
+  if let Some(fnc) = lout.listen_none_command() {
+    (*fnc)((api, vcmd))
   }
 }
 
@@ -151,7 +162,7 @@ fn extra_command(text: &String) -> (String, Vec<String>) {
             continue;
           }
           break;
-        },
+        }
         Some(ch) => builder.append(ch),
         None => continue,
       };

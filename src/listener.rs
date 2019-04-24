@@ -43,6 +43,9 @@ pub struct Listener {
   error_handler: Option<Arc<Box<dyn Fn((BotApi, String)) + Send + Sync + 'static>>>,
 
   command_handler: HashMap<&'static str, Arc<Box<dyn Fn((BotApi, VCommand)) + Send + Sync + 'static>>>,
+  precommand_handler: Option<Arc<Box<dyn Fn((BotApi, VCommand)) + Send + Sync + 'static>>>,
+  none_command_handler: Option<Arc<Box<dyn Fn((BotApi, VCommand)) + Send + Sync + 'static>>>,
+  incoming_handler: Option<Arc<Box<dyn Fn((BotApi, Incoming)) -> bool + Send + Sync + 'static>>>,
 }
 
 impl Default for Listener {
@@ -74,6 +77,9 @@ impl Default for Listener {
       callback_query_handler: None,
       error_handler: None,
       command_handler: HashMap::new(),
+      precommand_handler: None,
+      none_command_handler: None,
+      incoming_handler: None
     }
   }
 }
@@ -105,6 +111,21 @@ impl Listener {
     }
     let command: &'static str = Box::leak(command.to_string().into_boxed_str());
     self.command_handler.insert(command, Arc::new(Box::new(fnc)));
+    self
+  }
+
+  pub fn on_incoming<F>(&mut self, fnc: F) -> &mut Self where F: Fn((BotApi, Incoming)) -> bool + Send + Sync + 'static {
+    self.incoming_handler = Some(Arc::new(Box::new(fnc)));
+    self
+  }
+
+  pub fn on_precommand<F>(&mut self, fnc: F) -> &mut Self where F: Fn((BotApi, VCommand)) + Send + Sync + 'static {
+    self.precommand_handler = Some(Arc::new(Box::new(fnc)));
+    self
+  }
+
+  pub fn on_none_command<F>(&mut self, fnc: F) -> &mut Self where F: Fn((BotApi, VCommand)) + Send + Sync + 'static {
+    self.none_command_handler = Some(Arc::new(Box::new(fnc)));
     self
   }
 
@@ -227,6 +248,18 @@ pub struct Lout {
 impl Lout {
   pub fn new(listener: Listener) -> Self {
     Lout { listener }
+  }
+
+  pub fn listen_precommand(&self) -> &Option<Arc<Box<dyn Fn((BotApi, VCommand)) + Send + Sync + 'static>>> {
+    &self.listener.precommand_handler
+  }
+
+  pub fn listen_none_command(&self) -> &Option<Arc<Box<dyn Fn((BotApi, VCommand)) + Send + Sync + 'static>>> {
+    &self.listener.none_command_handler
+  }
+
+  pub fn listen_incoming(&self) -> &Option<Arc<Box<dyn Fn((BotApi, Incoming)) -> bool + Send + Sync + 'static>>> {
+    &self.listener.incoming_handler
   }
 
   pub fn listen_command(&self) -> &HashMap<&'static str, Arc<Box<dyn Fn((BotApi, VCommand)) + Send + Sync + 'static>>> {

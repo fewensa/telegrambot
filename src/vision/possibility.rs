@@ -1,7 +1,8 @@
+use serde::{Deserialize, Deserializer};
+
 use crate::advanced;
 use crate::types::RawMessage;
 use crate::vision::message::*;
-use serde::{Deserialize, Deserializer};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct PossibilityMessage {
@@ -28,6 +29,46 @@ impl PossibilityMessage {
 
   fn to_message(&self) -> Message {
     advanced::to_message(&self.raw, false)
+  }
+
+  pub fn is_text(&self) -> bool {
+    if let Some(_) = &self.raw.text { true } else { false }
+  }
+
+  pub fn is_audio(&self) -> bool {
+    if let Some(_) = &self.raw.audio { true } else { false }
+  }
+
+  pub fn is_document(&self) -> bool {
+    if let Some(_) = &self.raw.document { true } else { false }
+  }
+
+  pub fn is_photo(&self) -> bool {
+    if let Some(_) = &self.raw.photo { true } else { false }
+  }
+
+  pub fn is_sticker(&self) -> bool {
+    if let Some(_) = &self.raw.sticker { true } else { false }
+  }
+
+  pub fn is_video(&self) -> bool {
+    if let Some(_) = &self.raw.video { true } else { false }
+  }
+
+  pub fn is_voice(&self) -> bool {
+    if let Some(_) = &self.raw.voice { true } else { false }
+  }
+
+  pub fn is_video_note(&self) -> bool {
+    if let Some(_) = &self.raw.video_note { true } else { false }
+  }
+
+  pub fn is_location(&self) -> bool {
+    if let Some(_) = &self.raw.location { true } else { false }
+  }
+
+  pub fn is_venue(&self) -> bool {
+    if let Some(_) = &self.raw.venue { true } else { false }
   }
 
   pub fn with_raw<F>(&self, fnc: F) -> &Self where F: Fn(&RawMessage) {

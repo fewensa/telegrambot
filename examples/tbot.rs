@@ -8,6 +8,19 @@ mod config;
 
 fn main() {
   TelegramBot::new(config::config()).unwrap()
+    .on_incoming(|(api, ic)| {
+      if ic.is_channel() {
+        return false;
+      }
+      let possibility = ic.possibility().unwrap();
+      if possibility.is_sticker() {
+        return false;
+      }
+      possibility.with_text(|text| {
+          println!("INCOMING TEXT: {:?}", text);
+        });
+      true
+    })
     .on_text(|(api, vtex)| {
       if let Some(reply) = &vtex.message.reply_to_message {
         reply.with_text(|vtex| {

@@ -39,6 +39,24 @@ impl TelegramBot {
     self
   }
 
+  ///
+  /// incoming update
+  /// return bool, if true will run next listener else be back (stop this update).
+  pub fn on_incoming<F>(&mut self, fnc: F) -> &mut Self where F: Fn((BotApi, Incoming)) -> bool + Send + Sync + 'static {
+    self.listener.on_incoming(fnc);
+    self
+  }
+
+  pub fn on_precommand<F>(&mut self, fnc: F) -> &mut Self where F: Fn((BotApi, VCommand)) + Send + Sync + 'static {
+    self.listener.on_precommand(fnc);
+    self
+  }
+
+  pub fn on_none_command<F>(&mut self, fnc: F) -> &mut Self where F: Fn((BotApi, VCommand)) + Send + Sync + 'static {
+    self.listener.on_none_command(fnc);
+    self
+  }
+
   pub fn on_callback_query<F>(&mut self, fnc: F) -> &mut Self where F: Fn((BotApi, VCallbackQuery)) + Send + Sync + 'static {
     self.listener.on_callback_query(fnc);
     self

@@ -5,7 +5,7 @@ use crate::api::BotApi;
 use crate::listener::Lout;
 use crate::tglog;
 use crate::types::{Update, UpdateKind};
-use crate::vision::{PossibilityMessage, VCallbackQuery};
+use crate::vision::{PossibilityMessage, VCallbackQuery, Incoming};
 
 pub struct TGAdvancedHandler<'a> {
   lout: &'a Arc<Lout>,
@@ -22,6 +22,13 @@ impl<'a> TGAdvancedHandler<'a> {
 
   pub fn handle(&self, update: Update) {
     debug!(tglog::advanced(), "UPDATE => {:#?}", update);
+
+    if let Some(fnc) = self.lout.listen_incoming() {
+      let ic = Incoming::new(update.clone());
+      if !(*fnc)((self.api.clone(), ic)) {
+        return;
+      }
+    }
 
     if let Some(update_listener) = self.lout.listen_update() {
       (*update_listener)((self.api.clone(), update));

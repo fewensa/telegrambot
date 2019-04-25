@@ -1,6 +1,6 @@
 [package]
 name = "telegrambot"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["fewensa <fewensa@protonmail.com>"]
 description = "Telegram bot api"
 repository = "https://github.com/fewensa/telegrambot"

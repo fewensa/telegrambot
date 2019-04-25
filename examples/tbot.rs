@@ -35,6 +35,20 @@ fn main() {
         .map(|a| println!("{:?}", a))
         .map_err(|e| eprintln!("{:?}", e)));
     })
+    .on_video(|(api, vvm)| {
+      let chat = vvm.message.chat.id();
+      tokio::spawn(
+        api.get_file(&GetFile::new(vvm.video.file_id.clone()))
+          .and_then(move |file| {
+            println!("{:?}", file);
+            api.send_message(
+              SendMessage::new(chat, file.unwrap().file_id)
+                .parse_mode(ParseMode::Markdown))
+          })
+          .map(|a| println!("{:?}", a))
+          .map_err(|e| eprintln!("{:?}", e))
+      );
+    })
     .on_photo(|(api, pho)| {
       println!("=====> PHOTO: {:?}", pho);
     })

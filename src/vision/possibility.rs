@@ -1,7 +1,7 @@
 use serde::{Deserialize, Deserializer};
 
 use crate::advanced;
-use crate::types::{Chat, Contact, RawMessage, User};
+use crate::types::{Chat, RawMessage, User};
 use crate::vision::message::*;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
@@ -48,87 +48,87 @@ impl PossibilityMessage {
   }
 
   pub fn is_forward(&self) -> bool {
-    self.raw.forward_from != &None
+    self.raw.forward_from != None
   }
 
   pub fn is_new_chat_title(&self) -> bool {
-    self.raw.new_chat_title != &None
+    self.raw.new_chat_title != None
   }
 
   pub fn is_new_chat_photo(&self) -> bool {
-    self.raw.new_chat_photo != &None
+    self.raw.new_chat_photo != None
   }
 
   pub fn is_delete_chat_photo(&self) -> bool {
-    self.raw.delete_chat_photo != &None
+    self.raw.delete_chat_photo != None
   }
 
   pub fn is_group_chat_created(&self) -> bool {
-    self.raw.group_chat_created != &None
+    self.raw.group_chat_created != None
   }
 
   pub fn is_supergroup_chat_created(&self) -> bool {
-    self.raw.supergroup_chat_created != &None
+    self.raw.supergroup_chat_created != None
   }
 
   pub fn is_channel_chat_created(&self) -> bool {
-    self.raw.channel_chat_created != &None
+    self.raw.channel_chat_created != None
   }
 
   pub fn is_pinned_message(&self) -> bool {
-    self.raw.pinned_message != &None
+    self.raw.pinned_message != None
   }
 
   pub fn is_forward_user_hidden(&self) -> bool {
-    self.raw.forward_sender_name != &None
+    self.raw.forward_sender_name != None
   }
 
   pub fn is_reply(&self) -> bool {
-    self.raw.reply_to_message != &None
+    self.raw.reply_to_message != None
   }
 
   pub fn is_text(&self) -> bool {
-    self.raw.text != &None
+    self.raw.text != None
   }
 
   pub fn is_audio(&self) -> bool {
-    self.raw.audio != &None
+    self.raw.audio != None
   }
 
   pub fn is_document(&self) -> bool {
-    self.raw.document != &None
+    self.raw.document != None
   }
 
   pub fn is_photo(&self) -> bool {
-    self.raw.photo != &None
+    self.raw.photo != None
   }
 
   pub fn is_sticker(&self) -> bool {
-    self.raw.sticker != &None
+    self.raw.sticker != None
   }
 
   pub fn is_video(&self) -> bool {
-    self.raw.video != &None
+    self.raw.video != None
   }
 
   pub fn is_voice(&self) -> bool {
-    self.raw.voice != &None
+    self.raw.voice != None
   }
 
   pub fn is_video_note(&self) -> bool {
-    self.raw.video_note != &None
+    self.raw.video_note != None
   }
 
   pub fn is_location(&self) -> bool {
-    self.raw.location != &None
+    self.raw.location != None
   }
 
   pub fn is_venue(&self) -> bool {
-    self.raw.venue != &None
+    self.raw.venue != None
   }
 
   pub fn is_contact(&self) -> bool {
-    self.raw.contact != &None
+    self.raw.contact != None
   }
 
   pub fn from(&self) -> Option<User> {
@@ -147,7 +147,7 @@ impl PossibilityMessage {
     self
   }
 
-  pub fn with_contact<F>(&self, fnc: F) -> &Self where F: Fn(&Contact) {
+  pub fn with_contact<F>(&self, fnc: F) -> &Self where F: Fn(&VContactMessage) {
     if let Some(contact) = &self.raw.contact {
       let message = self.to_message();
       let entities = self.raw.entities.clone().unwrap_or_else(|| Vec::with_capacity(0));
